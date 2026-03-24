@@ -131,6 +131,15 @@ public class GamePanel extends JPanel implements Runnable {
     public void update(){
         //update character positions
         player.update();
+
+            // Break cooldown
+    if (keyH.attackCooldown > 0) keyH.attackCooldown--;
+
+    if (keyH.attackPressed && keyH.attackCooldown == 0) {
+        breakTileFacing(player.direction);
+        keyH.attackCooldown = 15;
+    }
+
         for (Item item : items){
             if (item != null){
                 item.update();
@@ -170,7 +179,6 @@ public class GamePanel extends JPanel implements Runnable {
     
     
 public void breakTileFacing(String direction) {
-    System.out.println("breaking facing " + direction);
     int col = (player.worldX + tileSize / 2) / tileSize;
     int row = (player.worldY + tileSize / 2) / tileSize;
 
@@ -181,35 +189,33 @@ public void breakTileFacing(String direction) {
         case "right": col++; break;
     }
 
+    // Bounds check first
     if (col < 0 || col >= maxWorldCol || row < 0 || row >= maxWorldRow) return;
 
-int tileNum = tileM.mapTileNum[col][row];
-Tile tile = tileM.tile[tileNum];
+    int tileNum = tileM.mapTileNum[col][row];
 
-if (!tile.breakable) return;
+    // Exit early if not breakable
+    if (!tileM.tile[tileNum].breakable) return;
 
 
     tileM.tileHP[col][row] -= player.toolLevel;
+
     System.out.println("Tile at (" + col + ", " + row + ") has " +  tileM.tileHP[col][row] + " HP.");
 
 
 
     if (tileM.tileHP[col][row] <= 0) {
-        tileM.tileHP[col][row] = tileM.tile[0].maxHP;
-        if (tile == tileM.tile[1]) {
-            tileM.mapTileNum[col][row] = 5;
-            Player.stone++;
-            System.out.println("added 1 stone to inventory");
-            spawnItem(new entity.object.OBJ_Stone(), col * tileSize, row * tileSize);
+            tileM.tileHP[col][row] = tileM.tile[0].maxHP;
 
+            if (tileNum == 1) {
+                tileM.mapTileNum[col][row] = 5;
+                Player.stone++;
+                spawnItem(new entity.object.OBJ_Stone(), col * tileSize, row * tileSize);
+            } else if (tileNum == 4) {
+                tileM.mapTileNum[col][row] = 0;
+                spawnItem(new entity.object.OBJ_Wood(), col * tileSize, row * tileSize);
+            }
         }
-        if (tile == tileM.tile[4]) {
-            //make a tree trunk
-            tileM.mapTileNum[col][row] = 0;
-            spawnItem(new entity.object.OBJ_Wood(), col * tileSize, row * tileSize);    
-        }
-
-    }
 }
     
 

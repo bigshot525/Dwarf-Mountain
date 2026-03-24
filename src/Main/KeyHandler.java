@@ -7,7 +7,8 @@ import java.awt.event.MouseEvent;
 
 public class KeyHandler implements KeyListener, MouseListener {
 
-    public boolean attackPressed;
+    public boolean attackPressed = false;
+    public int attackCooldown = 0;
     public boolean upPressed, downPressed, leftPressed, rightPressed, invPressed
     , craftPressed;
 
