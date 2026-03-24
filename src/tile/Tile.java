@@ -9,7 +9,7 @@ public class Tile {
     public int layer;
 
 
-        public int maxHP = 10;   // total hits required to break
+        public int maxHP = 3;   // total hits required to break
         public int currentHP;   // remaining hits
 
         public Tile() {

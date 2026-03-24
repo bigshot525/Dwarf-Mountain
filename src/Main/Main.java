@@ -3,14 +3,6 @@ package Main;
 
 import javax.swing.JFrame;
 
-
-/*
-
-    TODO
-    dwarf mining/building 2d gam
-    add animations for mining
-
-*/
 public class Main {
     public static void main(String[] args){
         JFrame window = new JFrame();

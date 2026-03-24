@@ -12,6 +12,8 @@ public class UI {
     }
 
     public void drawInventory(Graphics2D g2) {
+
+        // Inventory
         g2.setColor(new Color(0, 0, 0, 200));
         g2.fillRect(50, 50, gp.screenWidth - 100, gp.screenHeight - 100);
 
@@ -32,6 +34,8 @@ public class UI {
 
         g2.setColor(Color.WHITE);
         g2.setFont(g2.getFont().deriveFont(24f));
+        
+
         
         //Crafting UI
         g2.drawString("Crafting coming soon!", 60, 80);
