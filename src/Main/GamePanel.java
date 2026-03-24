@@ -13,6 +13,12 @@ import java.awt.Dimension;
 import java.awt.event.MouseListener;
 
 
+
+/*
+    break tiles/ spawn items
+
+*/
+
 public class GamePanel extends JPanel implements Runnable {
 
     public UI ui = new UI(this);
@@ -194,6 +200,8 @@ if (!tile.breakable) return;
             tileM.mapTileNum[col][row] = 5;
             Player.stone++;
             System.out.println("added 1 stone to inventory");
+            spawnItem(new entity.object.OBJ_Stone(), col * tileSize, row * tileSize);
+
         }
         if (tile == tileM.tile[4]) {
             //make a tree trunk
