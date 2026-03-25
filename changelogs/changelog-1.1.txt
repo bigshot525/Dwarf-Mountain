@@ -1,0 +1,16 @@
+CHANGES:
+    - added stone dropping animation when breaking stone
+    - added unbreakable stone tiles at edge of the mountain
+    - added a pause menu with tabs to switch between inventory and crafting
+    - added a main menu
+    - changed exit tab to add a button to exit
+    - added a save state
+    - added multiple saves ability
+
+        
+
+
+
+Bug Fixes:
+    - fixed lag when trying to break tiles
+    - fixed being able to break tiles while paused
