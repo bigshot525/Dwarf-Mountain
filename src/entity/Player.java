@@ -37,6 +37,7 @@ public class Player extends Entity {
 
         setDefaultValues();
         getPlayerImage();
+        getPlayerAttackImage();
     }
 
     public void setDefaultValues() {
@@ -81,10 +82,10 @@ public class Player extends Entity {
         // -------------------------
         // INVENTORY LOCK
         // -------------------------
-        if (gp.showInventory) {
+        if (gp.currentTab == 1) {
             if (keyH.invPressed) {
                 System.out.println("Player paused");
-                gp.showInventory = false;
+                gp.currentTab = 0;
                 keyH.invPressed = false;
             }
             return;
@@ -93,10 +94,10 @@ public class Player extends Entity {
         // -------------------------
         // CRAFTING UPDATE
         //--------------------------
-        if (gp.showCrafting) {
+        if (gp.currentTab == 2) {
             if (keyH.craftPressed) {
                 System.out.println("Player paused");
-                gp.showCrafting = false;
+                gp.currentTab = 0;
                 keyH.craftPressed = false;
             }
             return;
@@ -130,7 +131,6 @@ public class Player extends Entity {
             attacking = true;
             spriteCounter = 0;
             spriteNum = 1;
-            getPlayerAttackImage();
             performBreak();
             keyH.attackPressed = false;
             return;
@@ -181,12 +181,12 @@ public class Player extends Entity {
         // INVENTORY TOGGLE
         // -------------------------
         if (keyH.invPressed) {
-            gp.showInventory = true;
+            gp.currentTab = 1;
             keyH.invPressed = false;
         }
         //Crafting toggle
         if (keyH.craftPressed) {
-            gp.showCrafting = true;
+            gp.currentTab = 2;
             keyH.craftPressed = false;
         }
 
