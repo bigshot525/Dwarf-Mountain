@@ -1,0 +1,5 @@
+
+Balin:
+    works his store from 8am to 5pm
+    after 5pm he goes outside and waits outside his store untill 9pm where he goes back inside to sleep
+

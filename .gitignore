@@ -1,0 +1,21 @@
+cat > .gitignore << 'EOF'
+# IDE / VS Code
+.vscode/
+.classpath
+.project
+.settings/
+saves/
+
+# Compiled output
+bin/
+
+# JDK binaries
+openJdk-*/
+oracleJdk-*/
+*.dll
+*.jar
+
+# OS
+.DS_Store
+Thumbs.db
+EOF

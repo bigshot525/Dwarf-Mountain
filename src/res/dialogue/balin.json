@@ -1,0 +1,22 @@
+{
+  "firstMeeting": [
+    "Well now... I don't believe we've met before.",
+    "Name's Balin. I run the general store here in Underhill.",
+    "You must be the one who inherited that old cabin on the edge of town.",
+    "It's been empty for years, but it's good to see someone breathing life back into it.",
+    "If you ever need supplies, tools, or a place to sell what you find, you've come to the right dwarf.",
+    "Welcome to Underhill."
+  ],
+
+  "regularDialogue": [
+    [
+      "Good to see you again. Need anything from the shop today?"
+    ],
+    [
+      "The mountain has been quiet for years... though sometimes I swear I still hear the old mines calling."
+    ],
+    [
+      "Take care if you're heading into the mountain. It has a way of surprising even the most experienced miners."
+    ]
+  ]
+}

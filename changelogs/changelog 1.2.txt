@@ -1,0 +1,13 @@
+NEW FEATURES:
+    - Time, year, month, day, hour, minutes. - will add a calendar with events and sleeping through the night later
+CHANGES:
+    - added a better inventory with icons
+    - added a crafting menu with icons
+    - added crafing
+    - removed pickaxes from crafting
+    - added a house w/ a door to inside
+
+Bug Fixes:
+    - fixed items not going into inventory after crafting
+    - fixed items always showing in inventory even if user doesnt have them
+    - fixed time passing while in pause menu

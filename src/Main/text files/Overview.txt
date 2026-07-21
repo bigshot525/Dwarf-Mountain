@@ -1,0 +1,19 @@
+The user is an old decendant of ancient dwarves that went missing while mining deep in the mountain,
+They say they went missing because the dwarves mined too deep in the mountain,
+The town outside the mountain once full of life is now all but deserted, the local shop owner Balin is the only villager left in town
+the user needs to rebuild the town to fill it full of life
+
+Charactors:
+    The user (unnamed right now)
+Balin (shop owner)-
+    Balin is an old human, he has maps and ancient relics in his house, early on he only sells seeds and other items,
+    but later on he becomes a very important charactor for the story
+balins wife and son: (unnamed)
+
+
+Gameplay:
+    early game gameplay will consist of:
+    farming for money and tunneling out a home and making items / upgrading tools
+
+mid to late game:
+    user will find an old dwarven forge that they will be able to run to make mithril and other items for money and upgrades
