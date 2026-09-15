@@ -8,6 +8,7 @@ import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
+import java.io.InputStream;
 
 public class UI {
     //inventory fields
@@ -870,13 +871,54 @@ public class UI {
         }
         g2.setColor(Color.WHITE);
         g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 18f));
-        //random first message, 1/3 chance of each message, unless its players first time interacting with balin
-        if(gp.player.hasTalkedToBalin == false){
-            String msg = "Hello there! I'm Balin.";
+
+        //button to skip dialogue, located at bottom right of dialogue box
+        Rectangle skipButton = new Rectangle(gp.screenWidth - 375, gp.screenHeight - 100, 80, 30);
+
+        g2.setColor(Color.WHITE);
+        g2.fillRoundRect(skipButton.x, skipButton.y, skipButton.width, skipButton.height, 8, 8);
+        g2.setColor(Color.BLACK);
+        g2.drawRoundRect(skipButton.x, skipButton.y, skipButton.width, skipButton.height, 8, 8);
+        g2.setColor(Color.BLACK);
+        g2.setFont(g2.getFont().deriveFont(Font.BOLD, 14f));
+        g2.drawString("Skip", skipButton.x + 10, skipButton.y + 22);
+    
+
+
+        
+        //random message, 1/3 chance of each message, unless its players first time interacting with balin
+        if(!gp.player.hasTalkedToBalin){
+            String msg = "msg";
+            try {
+                InputStream is = getClass().getResourceAsStream("/res/dialogue/balin.json");
+                if (is != null) {
+                    // System.out.println("balin.json loaded successfully");
+                    String jsonText = new String(is.readAllBytes(), java.nio.charset.StandardCharsets.UTF_8);
+                        // lightweight JSON parsing to avoid external org.json dependency
+                        // look for firstMeeting array and extract first string entry
+                        String key = "\"firstMeeting\"";
+                        int ki = jsonText.indexOf(key);
+                        if (ki != -1) {
+                            int arrStart = jsonText.indexOf('[', ki);
+                            if (arrStart != -1) {
+                                int strStart = jsonText.indexOf('"', arrStart + 1);
+                                if (strStart != -1) {
+                                    int strEnd = jsonText.indexOf('"', strStart + 1);
+                                    if (strEnd != -1) {
+                                        msg = jsonText.substring(strStart + 1, strEnd);
+                                    }
+                                }
+                            }
+                        }
+                        //random message, 1/3 chance of each message
+                        // else{
+                        // }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
             g2.drawString(msg, 150, 350);
-            //TODO: set hasTalkedToBalin to true when player clicks okay button, so that next time they interact with balin they get a random message
-            
-            // gp.player.hasTalkedToBalin = true;
             return;
         }
         int rand = (int) (Math.random() * 3);

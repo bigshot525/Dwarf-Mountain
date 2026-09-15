@@ -1,10 +1,10 @@
 package entity;
 
 import Main.GamePanel;
+import Main.Time;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
-import Main.Time;
 
 public class Balin extends Entity {
 
@@ -81,13 +81,13 @@ public class Balin extends Entity {
 
         Time t = gp.t;
         // Morning - return to register
-        if(t.hour >= 5 && t.hour < 6){
+        if(t.hour >= 4 && t.hour < 5){
             if(!currentPosition.equals("register")){
                 moveToRegister();
             }
         }
         // Work outside
-        else if(t.hour >= 6 && t.hour < 20){
+        else if(t.hour >= 5 && t.hour < 20){
             if(!currentPosition.equals("outside")){
                 moveToOutside();
             }
@@ -217,7 +217,7 @@ public void moveToOutside() {
                 currentPosition = "inside";
                 goingToRegister = true;
                 goingOutside = false;
-                direction = " up";
+                direction = "up";
                 worldX = gp.tileSize * 7;
                 worldY = gp.tileSize * 29;
             }

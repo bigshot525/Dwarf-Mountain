@@ -57,7 +57,6 @@ public class KeyHandler implements KeyListener, MouseListener, MouseMotionListen
                 gp.currentTab = 0;
                 gp.showTimeOverlay = true; // Show time overlay when inventory is closed
             }
-
         }
         if (code == KeyEvent.VK_F){
             gp.showTimeOverlay = false; // Hide time overlay when inventory is open
