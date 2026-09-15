@@ -23,6 +23,12 @@ public class UI {
     private int heldFromSlot = -1;  // which slot it was picked up from
     private int mouseX, mouseY;     // live cursor pos, updated by mouseDragged
 
+    //Dialogue skip button
+    Rectangle skipButton = new Rectangle();
+    // Balin dialogue
+    private int balinDialogueIndex = 0;
+    private String balinRegularDialogue = "";
+    public int dailyBalinDialogueIndex = 0;
 
 
     GamePanel gp;
@@ -454,6 +460,26 @@ public class UI {
             return;
         }
 
+        // Balin dialogue skip/next button
+        if (gp.currentTab == 8 && skipButton.contains(mouseX, mouseY)) {
+            if(!gp.player.hasTalkedToBalin){
+                balinDialogueIndex++;
+                if (balinDialogueIndex >= 6) {
+                    gp.player.hasTalkedToBalin = true;
+                    dailyBalinDialogueIndex++;
+                    balinDialogueIndex = 0;
+                    gp.currentTab = 0;
+                }
+            }else{
+                //any interaction after first meeting sends player to the main game
+                dailyBalinDialogueIndex++;
+                balinRegularDialogue = "";
+                gp.currentTab = 0;
+            }
+            return;
+        }
+
+
         // Furnace smelt slot selection
         if (gp.currentTab == 4 && smeltSlotRects != null) {
             for (int i = 0; i < smeltSlotRects.length; i++) {
@@ -860,69 +886,194 @@ public class UI {
     }
 
     public void balinInteraction(Graphics2D g2) {
-        //draw background
+        //check if player has already talked to balin twice today, if so, dont let player interact with balin again until tomorrow
+        if(dailyBalinDialogueIndex >= 2){
+            return;
+        }
+
+        // Draw background
         try {
-            BufferedImage inventoryBackground = javax.imageio.ImageIO.read(getClass().getResourceAsStream("/res/ui/balinInteraction.png"));
+            BufferedImage inventoryBackground = javax.imageio.ImageIO.read(
+                getClass().getResourceAsStream("/res/ui/balinInteraction.png")
+            );
+
             if (inventoryBackground != null) {
                 g2.drawImage(inventoryBackground, 120, 300, gp.screenWidth - 230, gp.screenHeight - 350, null);
             }
         } catch (Exception e) {
             drawBackground(g2);
         }
-        g2.setColor(Color.WHITE);
-        g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 18f));
 
-        //button to skip dialogue, located at bottom right of dialogue box
-        Rectangle skipButton = new Rectangle(gp.screenWidth - 375, gp.screenHeight - 100, 80, 30);
+        String msg = "msg";
 
-        g2.setColor(Color.WHITE);
-        g2.fillRoundRect(skipButton.x, skipButton.y, skipButton.width, skipButton.height, 8, 8);
-        g2.setColor(Color.BLACK);
-        g2.drawRoundRect(skipButton.x, skipButton.y, skipButton.width, skipButton.height, 8, 8);
-        g2.setColor(Color.BLACK);
-        g2.setFont(g2.getFont().deriveFont(Font.BOLD, 14f));
-        g2.drawString("Skip", skipButton.x + 10, skipButton.y + 22);
-    
+        try {
+            InputStream is = getClass().getResourceAsStream("/res/dialogue/balin.json");
 
+            if (is != null) {
+                String jsonText = new String(
+                    is.readAllBytes(),
+                    java.nio.charset.StandardCharsets.UTF_8
+                );
 
-        
-        //random message, 1/3 chance of each message, unless its players first time interacting with balin
-        if(!gp.player.hasTalkedToBalin){
-            String msg = "msg";
-            try {
-                InputStream is = getClass().getResourceAsStream("/res/dialogue/balin.json");
-                if (is != null) {
-                    // System.out.println("balin.json loaded successfully");
-                    String jsonText = new String(is.readAllBytes(), java.nio.charset.StandardCharsets.UTF_8);
-                        // lightweight JSON parsing to avoid external org.json dependency
-                        // look for firstMeeting array and extract first string entry
-                        String key = "\"firstMeeting\"";
-                        int ki = jsonText.indexOf(key);
-                        if (ki != -1) {
-                            int arrStart = jsonText.indexOf('[', ki);
-                            if (arrStart != -1) {
-                                int strStart = jsonText.indexOf('"', arrStart + 1);
-                                if (strStart != -1) {
-                                    int strEnd = jsonText.indexOf('"', strStart + 1);
-                                    if (strEnd != -1) {
-                                        msg = jsonText.substring(strStart + 1, strEnd);
+                if (!gp.player.hasTalkedToBalin) {
+                    // Find the firstMeeting array
+                    String key = "\"firstMeeting\"";
+                    int keyIndex = jsonText.indexOf(key);
+
+                    if (keyIndex != -1) {
+                        int arrayStart = jsonText.indexOf('[', keyIndex);
+                        int arrayEnd = jsonText.indexOf(']', arrayStart);
+
+                        if (arrayStart != -1 && arrayEnd != -1) {
+                            String dialogueArray = jsonText.substring(arrayStart + 1, arrayEnd);
+
+                            // Extract every quoted string from the array
+                            java.util.ArrayList<String> lines = new java.util.ArrayList<>();
+
+                            boolean insideString = false;
+                            StringBuilder currentLine = new StringBuilder();
+
+                            for (int i = 0; i < dialogueArray.length(); i++) {
+                                char c = dialogueArray.charAt(i);
+
+                                if (c == '"' && (i == 0 || dialogueArray.charAt(i - 1) != '\\')) {
+                                    if (insideString) {
+                                        lines.add(currentLine.toString());
+                                        currentLine.setLength(0);
+                                        insideString = false;
+                                    } else {
+                                        insideString = true;
+                                    }
+                                } else if (insideString) {
+                                    currentLine.append(c);
+                                }
+                            }
+
+                            // Make sure the index is valid
+                            if (!lines.isEmpty()) {
+                                if (balinDialogueIndex >= lines.size()) {
+                                    balinDialogueIndex = lines.size() - 1;
+                                }
+
+                                msg = lines.get(balinDialogueIndex);
+                            }
+                        }
+                    }
+
+                    // Draw first-meeting dialogue
+                    g2.setColor(Color.WHITE);
+                    g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 18f));
+                    g2.drawString(msg, 150, 350);
+
+                }else {
+                    // Regular dialogue
+                    if (balinRegularDialogue.isEmpty()) {
+                        String key = "\"regularDialogue\"";
+                        int keyIndex = jsonText.indexOf(key);
+
+                        if (keyIndex != -1) {
+                            int arrayStart = jsonText.indexOf('[', keyIndex);
+
+                            if (arrayStart != -1) {
+                                int depth = 0;
+                                int arrayEnd = -1;
+
+                                for (int i = arrayStart; i < jsonText.length(); i++) {
+                                    char c = jsonText.charAt(i);
+
+                                    if (c == '[') {
+                                        depth++;
+                                    } else if (c == ']') {
+                                        depth--;
+
+                                        if (depth == 0) {
+                                            arrayEnd = i;
+                                            break;
+                                        }
+                                    }
+                                }
+
+                                if (arrayEnd != -1) {
+                                    String dialogueArray = jsonText.substring(arrayStart + 1, arrayEnd);
+
+                                    java.util.ArrayList<String> lines = new java.util.ArrayList<>();
+
+                                    boolean insideString = false;
+                                    StringBuilder currentLine = new StringBuilder();
+
+                                    for (int i = 0; i < dialogueArray.length(); i++) {
+                                        char c = dialogueArray.charAt(i);
+
+                                        if (c == '"' && (i == 0 || dialogueArray.charAt(i - 1) != '\\')) {
+                                            if (insideString) {
+                                                lines.add(currentLine.toString());
+                                                currentLine.setLength(0);
+                                                insideString = false;
+                                            } else {
+                                                insideString = true;
+                                            }
+                                        } else if (insideString) {
+                                            currentLine.append(c);
+                                        }
+                                    }
+
+                                    if (!lines.isEmpty()) {
+                                        int rand = (int) (Math.random() * lines.size());
+                                        balinRegularDialogue = lines.get(rand);
                                     }
                                 }
                             }
                         }
-                        //random message, 1/3 chance of each message
-                        // else{
-                        // }
+                    }
+
+                    msg = balinRegularDialogue;
+
+                    g2.setColor(Color.WHITE);
+                    g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 18f));
+                    g2.drawString(msg, 150, 350);
                 }
-            } catch (Exception e) {
-                e.printStackTrace();
+
+
             }
-
-            g2.drawString(msg, 150, 350);
-            return;
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        int rand = (int) (Math.random() * 3);
 
+        // Next / Close button
+        skipButton = new Rectangle(
+            gp.screenWidth - 375,
+            gp.screenHeight - 100,
+            80,
+            30
+        );
+
+        g2.setColor(Color.WHITE);
+        g2.fillRoundRect(
+            skipButton.x,
+            skipButton.y,
+            skipButton.width,
+            skipButton.height,
+            8,
+            8
+        );
+
+        g2.setColor(Color.BLACK);
+        g2.drawRoundRect(
+            skipButton.x,
+            skipButton.y,
+            skipButton.width,
+            skipButton.height,
+            8,
+            8
+        );
+
+        g2.setColor(Color.BLACK);
+        g2.setFont(g2.getFont().deriveFont(Font.BOLD, 14f));
+
+        if (!gp.player.hasTalkedToBalin && balinDialogueIndex >= 5) {
+            g2.drawString("Close", skipButton.x + 10, skipButton.y + 22);
+        } else {
+            g2.drawString("Next", skipButton.x + 10, skipButton.y + 22);
+        }
     }
-
 }

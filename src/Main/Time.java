@@ -1,8 +1,13 @@
 package Main;
 
+import UI.UI;
+
 
 //keep track of in-game time, for day/night cycle and time-based events
 public class Time {
+
+    GamePanel gp;
+
     // Internal: 0–23 hours, 0–59 minutes
     public int hour = 5;
     int minute = 0;
@@ -10,6 +15,10 @@ public class Time {
     int month = 0;
     int year = 0;
 
+
+    public Time(GamePanel gp) {
+        this.gp = gp;
+    }
     public void updateTime() {
         // hour++; // debug: skip by hour
         minute += 30;
@@ -43,6 +52,10 @@ public class Time {
 
     public void setToMorning() {
         System.out.println("Sleeping through the night...");
+
+        //Reset npc interactions
+        gp.ui.dailyBalinDialogueIndex = 0;
+
         hour = 6;
         minute = 0;
         day++;

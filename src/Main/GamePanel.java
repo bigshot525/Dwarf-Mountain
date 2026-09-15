@@ -29,7 +29,7 @@ public class GamePanel extends JPanel implements Runnable {
     Random rand = new Random();
 
     public UI ui = new UI(this);
-    public Time t = new Time();
+    public Time t = new Time(null);
 
     //init npcs
     Balin balin = new Balin(this);
@@ -78,10 +78,10 @@ public class GamePanel extends JPanel implements Runnable {
     //  7 = Balin's Shop,
     //  8 = Balin Interaction,
 
-    public int currentTab = 0; 
+    public int currentTab = 0;
 
 
-    //world seed 
+    //world seed
     public long worldSeed = 0;
 
     public boolean canMove = true;
