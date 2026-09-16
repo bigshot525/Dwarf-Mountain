@@ -47,19 +47,15 @@ public class KeyHandler implements KeyListener, MouseListener, MouseMotionListen
         if (code == KeyEvent.VK_E){
             if(gp.currentTab == 0){
                 gp.currentTab = 1;
-                gp.showTimeOverlay = false; // Hide time overlay when inventory is open
             }else if(gp.currentTab == 8){
                 Player.hasTalkedToBalin = true;
                 gp.currentTab = 0;
-                gp.showTimeOverlay = true; // Show time overlay when inventory is closed
             }
             else{
                 gp.currentTab = 0;
-                gp.showTimeOverlay = true; // Show time overlay when inventory is closed
             }
         }
         if (code == KeyEvent.VK_F){
-            gp.showTimeOverlay = false; // Hide time overlay when inventory is open
             craftPressed = true;
         }
 
@@ -93,11 +89,8 @@ public class KeyHandler implements KeyListener, MouseListener, MouseMotionListen
                 gp.currentTab = 0;
             }
             else if (gp.currentTab == 0) {
-                gp.showTimeOverlay = false; // hide time overlay
-
                 gp.currentTab = 3;
             } else {
-                gp.showTimeOverlay = true; // Show time overlay when returning to gameplay
                 gp.currentTab = 0;
             }
             gp.repaint();

@@ -29,7 +29,7 @@ public class GamePanel extends JPanel implements Runnable {
     Random rand = new Random();
 
     public UI ui = new UI(this);
-    public Time t = new Time(null);
+    public Time t = new Time(this);
 
     //init npcs
     Balin balin = new Balin(this);
@@ -600,7 +600,6 @@ public class GamePanel extends JPanel implements Runnable {
                     }
                 }
             }
-
             // Draw instruction text
             g2.setColor(new Color(0, 0, 0, 180));
             g2.fillRoundRect(screenWidth / 2 - 120, screenHeight - 60, 240, 45, 10, 10);

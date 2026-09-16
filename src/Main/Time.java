@@ -1,9 +1,4 @@
 package Main;
-
-import UI.UI;
-
-
-//keep track of in-game time, for day/night cycle and time-based events
 public class Time {
 
     GamePanel gp;
@@ -23,7 +18,6 @@ public class Time {
         // hour++; // debug: skip by hour
         minute += 30;
         // minute += 10; // real-time increment
-
         if (minute >= 60) {
             minute = 0;
             hour++;
