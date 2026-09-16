@@ -129,7 +129,10 @@ public class KeyHandler implements KeyListener, MouseListener, MouseMotionListen
             return;
         }
 
-        
+        if (gp.placementMode) {
+            gp.handlePlacementClick(e.getX(), e.getY());
+            return;
+        }
 
         // Handle placement mode clicks
         if (gp.currentTab == 1) {

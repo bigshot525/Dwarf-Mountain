@@ -748,6 +748,10 @@ public class GamePanel extends JPanel implements Runnable {
     public void handlePlacementClick(int screenX, int screenY) {
         if (!placementMode) return;
 
+        //debug
+        System.out.println("PLACEMENT CLICK: " + screenX + ", " + screenY);
+
+
         // Convert screen coordinates to world coordinates
         int worldX = screenX + player.worldX - player.screenX;
         int worldY = screenY + player.worldY - player.screenY;
@@ -755,6 +759,9 @@ public class GamePanel extends JPanel implements Runnable {
         // Snap to grid
         int col = worldX / tileSize;
         int row = worldY / tileSize;
+
+        //debug
+        System.out.println("Tile: " + col + ", " + row + " Valid: " + isValidPlacementTile(col, row));
 
         // Check if placement location is valid
         if (!isValidPlacementTile(col, row)) {
