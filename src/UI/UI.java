@@ -876,6 +876,43 @@ public class UI {
 
     }
 
+    // Method to wrap text based on a pixel width limit using Graphics2D
+    private java.util.List<String> wrapText(String msg, int maxWidth, Graphics2D g2) {
+        java.util.List<String> wrappedLines = new java.util.ArrayList<>();
+        String[] words = msg.split(" ");
+        StringBuilder currentLine = new StringBuilder();
+        FontMetrics fm = g2.getFontMetrics();
+
+        for (String word : words) {
+            // Build a look-ahead line containing the current word
+            String testLine = (currentLine.length() == 0) ? word : currentLine.toString() + " " + word;
+            
+            // Check actual rendering size in pixels
+            int pixelWidth = fm.stringWidth(testLine);
+
+            if (pixelWidth <= maxWidth) {
+                if (currentLine.length() > 0) {
+                    currentLine.append(" ");
+                }
+                currentLine.append(word);
+            } else {
+                // It exceeded 455px, add the existing line and reset for the next line
+                if (currentLine.length() > 0) {
+                    wrappedLines.add(currentLine.toString());
+                }
+                currentLine.setLength(0);
+                currentLine.append(word);
+            }
+        }
+
+        if (currentLine.length() > 0) {
+            wrappedLines.add(currentLine.toString());
+        }
+        
+        return wrappedLines;
+    }
+
+
     public void openBalinsShop(Graphics2D g2) {
         drawBackground(g2);
         g2.setColor(Color.WHITE);
@@ -960,10 +997,21 @@ public class UI {
                         }
                     }
 
-                    // Draw first-meeting dialogue
+                    // Draw first-meeting dialogue with text wrapping
                     g2.setColor(Color.WHITE);
                     g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 18f));
-                    g2.drawString(msg, 150, 350);
+
+                    int maxWidth = 305;
+                    int textX = 150;
+                    int textY = 350;
+                    int lineHeight = 25;
+
+                    java.util.List<String> wrappedLines = wrapText(msg, maxWidth, g2);
+
+                    for (String line : wrappedLines) {
+                        g2.drawString(line, textX, textY);
+                        textY += lineHeight;
+}
 
                 }else {
                     // Regular dialogue
@@ -1030,7 +1078,18 @@ public class UI {
 
                     g2.setColor(Color.WHITE);
                     g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 18f));
-                    g2.drawString(msg, 150, 350);
+
+                    int maxWidth = 305;
+                    java.util.List<String> wrappedLines = wrapText(msg, maxWidth, g2);
+
+                    int textX = 150;
+                    int textY = 350;
+                    int lineHeight = 25;
+
+                    for (String line : wrappedLines) {
+                        g2.drawString(line, textX, textY);
+                        textY += lineHeight;
+                    }
                 }
 
 

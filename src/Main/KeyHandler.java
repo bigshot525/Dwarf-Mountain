@@ -3,7 +3,6 @@ package Main;
 import UI.GameState;
 import UI.SaveScreen;
 import entity.Player;
-
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
@@ -95,7 +94,6 @@ public class KeyHandler implements KeyListener, MouseListener, MouseMotionListen
             }
             gp.repaint();
         }
-
     }
 
     @Override
