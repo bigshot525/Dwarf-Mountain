@@ -51,7 +51,7 @@ public class GamePanel extends JPanel implements Runnable {
     public boolean showFurnacePrompt = false; 
     public boolean showSleepPrompt = false;
     public boolean showBalinsShopPrompt = false;
-    public boolean showTimeOverlay = true;
+    public boolean showHud = true;
     public boolean showBalinInteraction = false;
 
     final int originalTileSize = 16; //16x16 tile
@@ -141,7 +141,7 @@ public class GamePanel extends JPanel implements Runnable {
     public void resetGame() {
         player.setDefaultValues();
         worldSeed = new java.util.Random().nextLong(); // random for each new game
-        showTimeOverlay = true;
+        showHud = true;
         t.reset();
         ui.resetInventoryLayout();
 
@@ -497,7 +497,7 @@ public class GamePanel extends JPanel implements Runnable {
 
         if (showSaveScreen) saveScreen.draw(g2);
 
-        drawTimeOverlay(g2);
+        drawHud(g2);
         ui.drawEnergyBar(g2);
 
         if (fadeAlpha > 0) {
@@ -515,10 +515,12 @@ public class GamePanel extends JPanel implements Runnable {
         g2.dispose();
     }
 
-    private void drawTimeOverlay(java.awt.Graphics2D g2) {
-        if (!showTimeOverlay) {
+    private void drawHud(java.awt.Graphics2D g2) {
+        if (!showHud) {
             return;
         }
+
+        //time overlay
         String dateText = t.getDateString();
         String timeText = t.getTimeString();
         g2.setFont(g2.getFont().deriveFont(java.awt.Font.BOLD, 18f));
@@ -529,7 +531,6 @@ public class GamePanel extends JPanel implements Runnable {
         int boxHeight = fm.getHeight() * 3 + lineSpacing * 2 + padding * 2;
         int x = screenWidth - boxWidth - 10;
         int y = 10;
-
         g2.setColor(new Color(0, 0, 0, 180));
         g2.fillRoundRect(x, y, boxWidth, boxHeight, 12, 12);
         g2.setColor(Color.WHITE);
@@ -541,7 +542,9 @@ public class GamePanel extends JPanel implements Runnable {
         //draw player money under time
         String moneyText = "Coins: " + player.coins;
         g2.drawString(moneyText, x + padding + (boxWidth / 2) - (fm.stringWidth(moneyText) / 2), y + padding + fm.getHeight() * 2 + lineSpacing * 2 + fm.getAscent() - 2);
-        
+    
+        //Hotbar overlay (9 slots, 1-9 keys, show item icon, make current slot thicker)
+
     }
 
     private void drawPlacementGrid(java.awt.Graphics2D g2) {
