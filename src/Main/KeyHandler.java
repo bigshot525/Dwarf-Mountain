@@ -8,13 +8,14 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 
-public class KeyHandler implements KeyListener, MouseListener, MouseMotionListener {
+public class KeyHandler implements KeyListener, MouseListener, MouseMotionListener, MouseWheelListener {
 
     public boolean attackPressed = false;
     public int attackCooldown = 0;
-    public boolean upPressed, downPressed, leftPressed, rightPressed, invPressed
-    , craftPressed;
+    public boolean upPressed, downPressed, leftPressed, rightPressed, invPressed, craftPressed;
     // reference to the game panel so we can toggle the central gamePaused flag
     GamePanel gp;
 
@@ -195,6 +196,17 @@ public class KeyHandler implements KeyListener, MouseListener, MouseMotionListen
 
         if (gp.currentTab == 1) {
             gp.ui.handleInventoryDrag(e.getX(), e.getY());
+        }
+    }
+
+    @Override
+    public void mouseWheelMoved(MouseWheelEvent e) {
+        if (e.getWheelRotation() < 0) {
+            // Mouse wheel moved up
+            gp.player.currentHotbarSlot = (gp.player.currentHotbarSlot + 1) % 9; 
+        } else {
+            // Mouse wheel moved down
+            gp.player.currentHotbarSlot = (gp.player.currentHotbarSlot + 8) % 9; 
         }
     }
 }

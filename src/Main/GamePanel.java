@@ -136,6 +136,7 @@ public class GamePanel extends JPanel implements Runnable {
 
         this.addMouseListener((MouseListener) keyH);
         this.addMouseMotionListener((java.awt.event.MouseMotionListener) keyH);
+        this.addMouseWheelListener(keyH);
     }
 
 
@@ -554,13 +555,13 @@ public class GamePanel extends JPanel implements Runnable {
             switch (currentSlot) {
                 case 0: hotbarImage = javax.imageio.ImageIO.read(getClass().getResourceAsStream("/res/UI/HotbarItem1.png")); break;
                 case 1: hotbarImage = javax.imageio.ImageIO.read(getClass().getResourceAsStream("/res/UI/HotbarItem2.png")); break;
-                case 2: hotbarImage = javax.imageio.ImageIO.read(getClass().getResourceAsStream("/res/UI/HotbarItem1.png")); break;
-                case 3: hotbarImage = javax.imageio.ImageIO.read(getClass().getResourceAsStream("/res/UI/HotbarItem1.png")); break;
-                case 4: hotbarImage = javax.imageio.ImageIO.read(getClass().getResourceAsStream("/res/UI/HotbarItem1.png")); break;
-                case 5: hotbarImage = javax.imageio.ImageIO.read(getClass().getResourceAsStream("/res/UI/HotbarItem1.png")); break;
-                case 6: hotbarImage = javax.imageio.ImageIO.read(getClass().getResourceAsStream("/res/UI/HotbarItem1.png")); break;
-                case 7: hotbarImage = javax.imageio.ImageIO.read(getClass().getResourceAsStream("/res/UI/HotbarItem1.png")); break;
-                case 8: hotbarImage = javax.imageio.ImageIO.read(getClass().getResourceAsStream("/res/UI/HotbarItem1.png")); break;
+                case 2: hotbarImage = javax.imageio.ImageIO.read(getClass().getResourceAsStream("/res/UI/HotbarItem3.png")); break;
+                case 3: hotbarImage = javax.imageio.ImageIO.read(getClass().getResourceAsStream("/res/UI/HotbarItem4.png")); break;
+                case 4: hotbarImage = javax.imageio.ImageIO.read(getClass().getResourceAsStream("/res/UI/HotbarItem5.png")); break;
+                case 5: hotbarImage = javax.imageio.ImageIO.read(getClass().getResourceAsStream("/res/UI/HotbarItem6.png")); break;
+                case 6: hotbarImage = javax.imageio.ImageIO.read(getClass().getResourceAsStream("/res/UI/HotbarItem7.png")); break;
+                case 7: hotbarImage = javax.imageio.ImageIO.read(getClass().getResourceAsStream("/res/UI/HotbarItem8.png")); break;
+                case 8: hotbarImage = javax.imageio.ImageIO.read(getClass().getResourceAsStream("/res/UI/HotbarItem9.png")); break;
             }
         } catch (Exception e) {
             e.printStackTrace();
