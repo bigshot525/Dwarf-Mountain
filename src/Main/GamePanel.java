@@ -1,6 +1,7 @@
 package Main;
 
 import UI.GameState;
+import UI.InteractionUIs.BalinInteractionUI;
 import UI.MainMenu;
 import UI.SaveScreen;
 import UI.UI;
@@ -33,6 +34,7 @@ public class GamePanel extends JPanel implements Runnable {
 
     //init npcs
     Balin balin = new Balin(this);
+    public BalinInteractionUI balinInteractionUI;
 
     public SaveManager saveManager = new SaveManager(this);
     public GameState gameState = GameState.MAIN_MENU;
@@ -124,16 +126,16 @@ public class GamePanel extends JPanel implements Runnable {
  
 
     public GamePanel(){
+        balinInteractionUI = new BalinInteractionUI(this, ui);
 
-    this.setPreferredSize(new Dimension(screenWidth, screenHeight));
+        this.setPreferredSize(new Dimension(screenWidth, screenHeight));
         this.setBackground(Color.black);
         this.setDoubleBuffered(true);
         this.addKeyListener(keyH);
         this.setFocusable(true);
 
-    this.addMouseListener((MouseListener) keyH);
-    this.addMouseMotionListener((java.awt.event.MouseMotionListener) keyH);
-
+        this.addMouseListener((MouseListener) keyH);
+        this.addMouseMotionListener((java.awt.event.MouseMotionListener) keyH);
     }
 
 
@@ -492,7 +494,7 @@ public class GamePanel extends JPanel implements Runnable {
         if (currentTab > 0 && currentTab < 4) ui.draw(g2);
 
         if(currentTab == 8){
-            ui.balinInteraction(g2);
+            balinInteractionUI.balinInteraction(g2);
         }
 
         if (showSaveScreen) saveScreen.draw(g2);
@@ -519,7 +521,6 @@ public class GamePanel extends JPanel implements Runnable {
         if (!showHud) {
             return;
         }
-
         //time overlay
         String dateText = t.getDateString();
         String timeText = t.getTimeString();
@@ -544,7 +545,32 @@ public class GamePanel extends JPanel implements Runnable {
         g2.drawString(moneyText, x + padding + (boxWidth / 2) - (fm.stringWidth(moneyText) / 2), y + padding + fm.getHeight() * 2 + lineSpacing * 2 + fm.getAscent() - 2);
     
         //Hotbar overlay (9 slots, 1-9 keys, show item icon, make current slot thicker)
+        //get current slot from player.currentHotbarSlot (0-8)
+        //get specific hotbar png based on the current slot
+        int currentSlot = player.currentHotbarSlot;
+        java.awt.image.BufferedImage hotbarImage = null;
 
+        try {
+            switch (currentSlot) {
+                case 0: hotbarImage = javax.imageio.ImageIO.read(getClass().getResourceAsStream("/res/UI/HotbarItem1.png")); break;
+                case 1: hotbarImage = javax.imageio.ImageIO.read(getClass().getResourceAsStream("/res/UI/HotbarItem2.png")); break;
+                case 2: hotbarImage = javax.imageio.ImageIO.read(getClass().getResourceAsStream("/res/UI/HotbarItem1.png")); break;
+                case 3: hotbarImage = javax.imageio.ImageIO.read(getClass().getResourceAsStream("/res/UI/HotbarItem1.png")); break;
+                case 4: hotbarImage = javax.imageio.ImageIO.read(getClass().getResourceAsStream("/res/UI/HotbarItem1.png")); break;
+                case 5: hotbarImage = javax.imageio.ImageIO.read(getClass().getResourceAsStream("/res/UI/HotbarItem1.png")); break;
+                case 6: hotbarImage = javax.imageio.ImageIO.read(getClass().getResourceAsStream("/res/UI/HotbarItem1.png")); break;
+                case 7: hotbarImage = javax.imageio.ImageIO.read(getClass().getResourceAsStream("/res/UI/HotbarItem1.png")); break;
+                case 8: hotbarImage = javax.imageio.ImageIO.read(getClass().getResourceAsStream("/res/UI/HotbarItem1.png")); break;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        if (hotbarImage != null) {
+            // Keeps your exact original coordinates (200, 500)
+            g2.drawImage(hotbarImage, 150, 500, 450, 60, null);
+        }
+
+        //draw png of the hotbar in the bottom center of the screen
     }
 
     private void drawPlacementGrid(java.awt.Graphics2D g2) {

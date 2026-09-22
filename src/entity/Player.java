@@ -20,6 +20,9 @@ public class Player extends Entity {
 
     public boolean canMove = true;
 
+    //current hotbar slot (0-8)
+    public int currentHotbarSlot = 0;
+
     //player stats
     public int maxHealth = 100;
     public int health = maxHealth;

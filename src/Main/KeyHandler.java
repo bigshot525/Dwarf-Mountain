@@ -94,6 +94,18 @@ public class KeyHandler implements KeyListener, MouseListener, MouseMotionListen
             }
             gp.repaint();
         }
+
+        //hotbar switching with number keys 1-9 or mousewheel
+        if (code >= KeyEvent.VK_1 && code <= KeyEvent.VK_9) {
+            gp.player.currentHotbarSlot = code - KeyEvent.VK_1; // 0-8
+        }
+        //mousewheel switching
+        if (code == KeyEvent.VK_PAGE_UP) {
+            gp.player.currentHotbarSlot = (gp.player.currentHotbarSlot + 1) % 9; // wrap around
+        }
+        if (code == KeyEvent.VK_PAGE_DOWN) {
+            gp.player.currentHotbarSlot = (gp.player.currentHotbarSlot + 8) % 9; // wrap around
+        }
     }
 
     @Override

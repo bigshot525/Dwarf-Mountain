@@ -1,6 +1,7 @@
 package UI;
 
 import Main.GamePanel;
+import UI.InteractionUIs.BalinInteractionUI;
 import entity.Player;
 import java.awt.Color;
 import java.awt.Font;
@@ -8,7 +9,6 @@ import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
-import java.io.InputStream;
 
 public class UI {
     //inventory fields
@@ -24,14 +24,16 @@ public class UI {
     private int mouseX, mouseY;     // live cursor pos, updated by mouseDragged
 
     //Dialogue skip button
-    Rectangle skipButton = new Rectangle();
+    public Rectangle skipButton = new Rectangle();
     // Balin dialogue
-    private int balinDialogueIndex = 0;
-    private String balinRegularDialogue = "";
+    public int balinDialogueIndex = 0;
+    public String balinRegularDialogue = "";
     public int dailyBalinDialogueIndex = 0;
 
 
     GamePanel gp;
+    private BalinInteractionUI balinInteractionUI;
+    
     private Rectangle[] tabRects = new Rectangle[3];
     private Rectangle exitButton;
     private Rectangle passoutOkButton;
@@ -140,6 +142,7 @@ public class UI {
 
     public UI(GamePanel gp) {
         this.gp = gp;
+        balinInteractionUI = new BalinInteractionUI(gp, this);
 
         loadItemIcons();
     }
@@ -196,7 +199,7 @@ public class UI {
         }
     }
 
-    private void drawBackground(Graphics2D g2) {
+    public void drawBackground(Graphics2D g2) {
         g2.setColor(new Color(0, 0, 0, 200));
         g2.fillRect(50, 50, gp.screenWidth - 100, gp.screenHeight - 100);
 
@@ -877,7 +880,7 @@ public class UI {
     }
 
     // Method to wrap text based on a pixel width limit using Graphics2D
-    private java.util.List<String> wrapText(String msg, int maxWidth, Graphics2D g2) {
+    public java.util.List<String> wrapText(String msg, int maxWidth, Graphics2D g2) {
         java.util.List<String> wrappedLines = new java.util.ArrayList<>();
         String[] words = msg.split(" ");
         StringBuilder currentLine = new StringBuilder();
@@ -922,217 +925,4 @@ public class UI {
         g2.drawString(msg, 200, 150);
     }
 
-    public void balinInteraction(Graphics2D g2) {
-        //check if player has already talked to balin twice today, if so, dont let player interact with balin again until tomorrow
-        if(dailyBalinDialogueIndex >= 2){
-            return;
-        }
-
-        // Draw background
-        try {
-            BufferedImage inventoryBackground = javax.imageio.ImageIO.read(
-                getClass().getResourceAsStream("/res/ui/balinInteraction.png")
-            );
-
-            if (inventoryBackground != null) {
-                g2.drawImage(inventoryBackground, 120, 300, gp.screenWidth - 230, gp.screenHeight - 350, null);
-            }
-        } catch (Exception e) {
-            drawBackground(g2);
-        }
-
-        String msg = "msg";
-
-        try {
-            InputStream is = getClass().getResourceAsStream("/res/dialogue/balin.json");
-
-            if (is != null) {
-                String jsonText = new String(
-                    is.readAllBytes(),
-                    java.nio.charset.StandardCharsets.UTF_8
-                );
-
-                if (!gp.player.hasTalkedToBalin) {
-                    // Find the firstMeeting array
-                    String key = "\"firstMeeting\"";
-                    int keyIndex = jsonText.indexOf(key);
-
-                    if (keyIndex != -1) {
-                        int arrayStart = jsonText.indexOf('[', keyIndex);
-                        int arrayEnd = jsonText.indexOf(']', arrayStart);
-
-                        if (arrayStart != -1 && arrayEnd != -1) {
-                            String dialogueArray = jsonText.substring(arrayStart + 1, arrayEnd);
-
-                            // Extract every quoted string from the array
-                            java.util.ArrayList<String> lines = new java.util.ArrayList<>();
-
-                            boolean insideString = false;
-                            StringBuilder currentLine = new StringBuilder();
-
-                            for (int i = 0; i < dialogueArray.length(); i++) {
-                                char c = dialogueArray.charAt(i);
-
-                                if (c == '"' && (i == 0 || dialogueArray.charAt(i - 1) != '\\')) {
-                                    if (insideString) {
-                                        lines.add(currentLine.toString());
-                                        currentLine.setLength(0);
-                                        insideString = false;
-                                    } else {
-                                        insideString = true;
-                                    }
-                                } else if (insideString) {
-                                    currentLine.append(c);
-                                }
-                            }
-
-                            // Make sure the index is valid
-                            if (!lines.isEmpty()) {
-                                if (balinDialogueIndex >= lines.size()) {
-                                    balinDialogueIndex = lines.size() - 1;
-                                }
-
-                                msg = lines.get(balinDialogueIndex);
-                            }
-                        }
-                    }
-
-                    // Draw first-meeting dialogue with text wrapping
-                    g2.setColor(Color.WHITE);
-                    g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 18f));
-
-                    int maxWidth = 305;
-                    int textX = 150;
-                    int textY = 350;
-                    int lineHeight = 25;
-
-                    java.util.List<String> wrappedLines = wrapText(msg, maxWidth, g2);
-
-                    for (String line : wrappedLines) {
-                        g2.drawString(line, textX, textY);
-                        textY += lineHeight;
-}
-
-                }else {
-                    // Regular dialogue
-                    if (balinRegularDialogue.isEmpty()) {
-                        String key = "\"regularDialogue\"";
-                        int keyIndex = jsonText.indexOf(key);
-
-                        if (keyIndex != -1) {
-                            int arrayStart = jsonText.indexOf('[', keyIndex);
-
-                            if (arrayStart != -1) {
-                                int depth = 0;
-                                int arrayEnd = -1;
-
-                                for (int i = arrayStart; i < jsonText.length(); i++) {
-                                    char c = jsonText.charAt(i);
-
-                                    if (c == '[') {
-                                        depth++;
-                                    } else if (c == ']') {
-                                        depth--;
-
-                                        if (depth == 0) {
-                                            arrayEnd = i;
-                                            break;
-                                        }
-                                    }
-                                }
-
-                                if (arrayEnd != -1) {
-                                    String dialogueArray = jsonText.substring(arrayStart + 1, arrayEnd);
-
-                                    java.util.ArrayList<String> lines = new java.util.ArrayList<>();
-
-                                    boolean insideString = false;
-                                    StringBuilder currentLine = new StringBuilder();
-
-                                    for (int i = 0; i < dialogueArray.length(); i++) {
-                                        char c = dialogueArray.charAt(i);
-
-                                        if (c == '"' && (i == 0 || dialogueArray.charAt(i - 1) != '\\')) {
-                                            if (insideString) {
-                                                lines.add(currentLine.toString());
-                                                currentLine.setLength(0);
-                                                insideString = false;
-                                            } else {
-                                                insideString = true;
-                                            }
-                                        } else if (insideString) {
-                                            currentLine.append(c);
-                                        }
-                                    }
-
-                                    if (!lines.isEmpty()) {
-                                        int rand = (int) (Math.random() * lines.size());
-                                        balinRegularDialogue = lines.get(rand);
-                                    }
-                                }
-                            }
-                        }
-                    }
-
-                    msg = balinRegularDialogue;
-
-                    g2.setColor(Color.WHITE);
-                    g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 18f));
-
-                    int maxWidth = 305;
-                    java.util.List<String> wrappedLines = wrapText(msg, maxWidth, g2);
-
-                    int textX = 150;
-                    int textY = 350;
-                    int lineHeight = 25;
-
-                    for (String line : wrappedLines) {
-                        g2.drawString(line, textX, textY);
-                        textY += lineHeight;
-                    }
-                }
-
-
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        // Next / Close button
-        skipButton = new Rectangle(
-            gp.screenWidth - 375,
-            gp.screenHeight - 100,
-            80,
-            30
-        );
-
-        g2.setColor(Color.WHITE);
-        g2.fillRoundRect(
-            skipButton.x,
-            skipButton.y,
-            skipButton.width,
-            skipButton.height,
-            8,
-            8
-        );
-
-        g2.setColor(Color.BLACK);
-        g2.drawRoundRect(
-            skipButton.x,
-            skipButton.y,
-            skipButton.width,
-            skipButton.height,
-            8,
-            8
-        );
-
-        g2.setColor(Color.BLACK);
-        g2.setFont(g2.getFont().deriveFont(Font.BOLD, 14f));
-
-        if (!gp.player.hasTalkedToBalin && balinDialogueIndex >= 5) {
-            g2.drawString("Close", skipButton.x + 10, skipButton.y + 22);
-        } else {
-            g2.drawString("Next", skipButton.x + 10, skipButton.y + 22);
-        }
-    }
 }
