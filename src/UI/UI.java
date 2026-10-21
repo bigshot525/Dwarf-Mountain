@@ -227,9 +227,6 @@ public class UI {
     }
 
     private void drawInventory(Graphics2D g2) {
-        //hide date time and money
-        // gp.showTimeOverlay = false;
-
         //put inventoryBackground.png in the background of the inventory screen
         try {
             BufferedImage inventoryBackground = javax.imageio.ImageIO.read(getClass().getResourceAsStream("/res/ui/inventoryBackground.png"));
@@ -264,23 +261,14 @@ public class UI {
             boolean isBeingDragged = (slot == heldFromSlot && heldItemIndex != -1);
 
             if (itemIndex != -1 && !isBeingDragged && counts[itemIndex] > 0) {
-                // Cell background
-                // g2.setColor(new Color(60, 60, 60, 200));
-                // g2.fillRoundRect(x, y, cellSize, cellSize, 8, 8);
-                // g2.setColor(new Color(180, 180, 180, 200));
-                // g2.drawRoundRect(x, y, cellSize, cellSize, 8, 8);
-
                 BufferedImage iconToDraw = itemIcons[itemIndex];
                 if (iconToDraw != null) {
                     g2.drawImage(iconToDraw, x + 8, y + 8, cellSize - 16, cellSize - 16, null);
                     g2.setColor(Color.GRAY);
                 }
-
                 // Name below cell
                 g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 11f));
                 FontMetrics fm = g2.getFontMetrics();
-                // g2.setColor(Color.LIGHT_GRAY);
-                // g2.drawString(inventoryItemNames[itemIndex], x + cellSize / 2 - fm.stringWidth(inventoryItemNames[itemIndex]) / 2, y + cellSize + 14);
 
                 // Count badge
                 String countStr = String.valueOf(counts[itemIndex]);
@@ -294,7 +282,6 @@ public class UI {
                 g2.drawString(countStr, badgeX, badgeY);
             }
         }
-
         drawHeldItem(g2);
     }
 
@@ -647,6 +634,30 @@ public class UI {
         if (!slotsInit) initInventorySlots();
         return slotItems;
     }
+
+    public void drawgbarItems(Graphics2D g2, int x, int y, int slotWidth, int slotHeight) {
+        if (!slotsInit) initInventorySlots();
+
+        int[] counts = updatedHave();
+        for (int slot = 0; slot < INV_COLS; slot++) {
+            int itemIndex = slotItems[slot];
+            if (itemIndex < 0 || itemIndex >= itemIcons.length || counts[itemIndex] <= 0) continue;
+
+            BufferedImage icon = itemIcons[itemIndex];
+            if (icon == null) continue;
+
+            int iconSize = Math.min(slotHeight - 16, slotWidth - 12);
+            int iconX = x + slot * slotWidth + (slotWidth - iconSize) / 2;
+            int iconY = y + (slotHeight - iconSize) / 2;
+            g2.drawImage(icon, iconX, iconY, iconSize, iconSize, null);
+
+            String count = String.valueOf(counts[itemIndex]);
+            g2.setFont(g2.getFont().deriveFont(Font.BOLD, 12f));
+            g2.setColor(Color.WHITE);
+            g2.drawString(count, x + slot * slotWidth + slotWidth - 5 - g2.getFontMetrics().stringWidth(count), y + slotHeight - 5);
+        }
+    }
+
     public void setSlotItems(int[] slots) {
         slotItems = slots.clone();
         slotsInit = true;

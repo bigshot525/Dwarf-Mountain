@@ -77,14 +77,14 @@ public class MainMenu {
     public void handleClick(int mouseX, int mouseY) {
         if (playButton.contains(mouseX, mouseY)) {
             gp.resetGame();
-            gp.gameState = GameState.PLAYING;
+            gp.gameState = GameState.SELECT_GAME;
             gp.saveScreen.open(SaveScreen.Mode.SAVE);
             gp.showSaveScreen = true; // prompt for name immediately
         }
         if (loadButton.contains(mouseX, mouseY) && hasSave) {
             gp.saveScreen.open(SaveScreen.Mode.LOAD);
             gp.showSaveScreen = true;
-            gp.gameState = GameState.PLAYING;
+            gp.gameState = GameState.SELECT_GAME;
         }
         if (quitButton.contains(mouseX, mouseY)) {
             System.exit(0);

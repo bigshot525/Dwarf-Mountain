@@ -19,12 +19,7 @@ import java.util.Random;
 import javax.swing.JPanel;
 import tile.TileManager;
 
-
-
-/*
-    break tiles/ spawn items
-
-*/
+import static UI.GameState.MAIN_MENU;
 
 public class GamePanel extends JPanel implements Runnable {
     Random rand = new Random();
@@ -37,7 +32,7 @@ public class GamePanel extends JPanel implements Runnable {
     public BalinInteractionUI balinInteractionUI;
 
     public SaveManager saveManager = new SaveManager(this);
-    public GameState gameState = GameState.MAIN_MENU;
+    public GameState gameState = MAIN_MENU;
     public MainMenu mainMenu = new MainMenu(this);
     public SaveScreen saveScreen = new SaveScreen(this);
     public java.util.List<WorldObject> worldObjects = new java.util.ArrayList<>();
@@ -53,7 +48,7 @@ public class GamePanel extends JPanel implements Runnable {
     public boolean showFurnacePrompt = false; 
     public boolean showSleepPrompt = false;
     public boolean showBalinsShopPrompt = false;
-    public boolean showHud = true;
+    public boolean showHud = false;
     public boolean showBalinInteraction = false;
 
     final int originalTileSize = 16; //16x16 tile
@@ -234,7 +229,7 @@ public class GamePanel extends JPanel implements Runnable {
     }
     
     public void update() {
-        if (gameState == GameState.MAIN_MENU) {
+        if (gameState == MAIN_MENU) {
             mainMenu.update();
             return;
         }
@@ -423,7 +418,7 @@ public class GamePanel extends JPanel implements Runnable {
         super.paintComponent(g);
         java.awt.Graphics2D g2 = (java.awt.Graphics2D) g;
 
-        if (gameState == GameState.MAIN_MENU) {
+        if (gameState == MAIN_MENU) {
             mainMenu.draw(g2);
             g2.dispose();
             return;
@@ -500,8 +495,10 @@ public class GamePanel extends JPanel implements Runnable {
 
         if (showSaveScreen) saveScreen.draw(g2);
 
-        drawHud(g2);
-        ui.drawEnergyBar(g2);
+        if (!showSaveScreen) {
+            drawHud(g2);
+            ui.drawEnergyBar(g2);
+        }
 
         if (fadeAlpha > 0) {
             g2.setComposite(java.awt.AlphaComposite.getInstance(
@@ -519,7 +516,7 @@ public class GamePanel extends JPanel implements Runnable {
     }
 
     private void drawHud(java.awt.Graphics2D g2) {
-        if (!showHud) {
+        if (!showHud || currentTab != 0) {
             return;
         }
         //time overlay
@@ -570,8 +567,9 @@ public class GamePanel extends JPanel implements Runnable {
             // Keeps your exact original coordinates (200, 500)
             g2.drawImage(hotbarImage, 150, 500, 450, 60, null);
         }
+        ui.drawHotbarItems(g2, 150, 500, 50, 60);
 
-        //draw png of the hotbar in the bottom center of the screen
+
     }
 
     private void drawPlacementGrid(java.awt.Graphics2D g2) {
