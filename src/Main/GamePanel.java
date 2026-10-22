@@ -509,7 +509,7 @@ public class GamePanel extends JPanel implements Runnable {
                 java.awt.AlphaComposite.SRC_OVER, 1f));
         }
 
-        if (placementMode) {
+        if (placementMode || getSelectedHotbarPlaceableItem() != null) {
             drawPlacementGrid(g2);
         }
         g2.dispose();
@@ -569,22 +569,20 @@ public class GamePanel extends JPanel implements Runnable {
         }
         ui.drawHotbarItems(g2, 150, 500, 50, 60);
 
-
     }
 
     private void drawPlacementGrid(java.awt.Graphics2D g2) {
-        //check if item is placeable
-        boolean placeable = false;
-        if(itemToPlace.equals("furnace") && Player.furnace > 0){
-            placeable = true;
-        }else if(itemToPlace.equals("stoneBed") && Player.stoneBed > 0){
-            placeable = true;
-        }
+        String previewItem = placementMode ? itemToPlace : getSelectedHotbarPlaceableItem();
+        boolean placeable = isPlaceableAvailable(previewItem);
 
         if(placeable){
             // Get the grid cell containing the player's center
             int gridCol = (player.worldX + tileSize / 2) / tileSize;
             int gridRow = (player.worldY + tileSize / 2) / tileSize;
+            int hoverCol = (mouseScreenX + player.worldX - player.screenX) / tileSize;
+            int hoverRow = (mouseScreenY + player.worldY - player.screenY) / tileSize;
+            boolean cursorInRange = Math.abs(hoverCol - gridCol) <= 1
+                && Math.abs(hoverRow - gridRow) <= 1;
 
             // Draw 3x3 grid centered under the player
             for (int dy = 1; dy <= 3; dy++) {
@@ -601,9 +599,10 @@ public class GamePanel extends JPanel implements Runnable {
                         screenY + tileSize > 0 && screenY < screenHeight) {
                         
                         boolean isValid = isValidPlacementTile(col, row);
+                        boolean isHoveredCell = col == hoverCol && row == hoverRow;
                         
                         // Highlight center cell and show valid/invalid status
-                        if (dx == 0 && dy == 2) {
+                        if (isHoveredCell || (!cursorInRange && dx == 0 && dy == 2)) {
                             // Center cell - bright if valid, red if invalid
                             if (isValid) {
                                 g2.setColor(new Color(0, 255, 0, 150));
@@ -635,9 +634,30 @@ public class GamePanel extends JPanel implements Runnable {
             g2.setFont(g2.getFont().deriveFont(Font.BOLD, 16f));
             FontMetrics fm = g2.getFontMetrics();
             String instruction = "Click to place | ESC to cancel";
-            g2.drawString(instruction, screenWidth / 2 - fm.stringWidth(instruction) / 2, screenHeight - 30);
+            if (placementMode) {
+                g2.drawString(instruction, screenWidth / 2 - fm.stringWidth(instruction) / 2, screenHeight - 30);
+            }
         }else{
             return;
+        }
+    }
+
+    private boolean isPlaceableAvailable(String itemType) {
+        return ("furnace".equals(itemType) && Player.furnace > 0)
+            || ("stoneBed".equals(itemType) && Player.stoneBed > 0);
+    }
+
+    public String getSelectedHotbarPlaceableItem() {
+        if (currentTab != 0 || !showHud || showSaveScreen) return null;
+
+        int slot = player.currentHotbarSlot;
+        int[] slots = ui.getSlotItems();
+        if (slot < 0 || slot >= slots.length) return null;
+
+        switch (slots[slot]) {
+            case 7: return "furnace";
+            case 8: return "stoneBed";
+            default: return null;
         }
     }
 
@@ -806,6 +826,26 @@ public class GamePanel extends JPanel implements Runnable {
             Player.stoneBed--;
             cancelPlacement();
         }
+    }
+
+    public boolean tryPlaceSelectedHotbarItem(int screenX, int screenY) {
+        String itemType = getSelectedHotbarPlaceableItem();
+        if (!isPlaceableAvailable(itemType)) return false;
+
+        int worldX = screenX + player.worldX - player.screenX;
+        int worldY = screenY + player.worldY - player.screenY;
+        int col = worldX / tileSize;
+        int row = worldY / tileSize;
+        if (!isValidPlacementTile(col, row)) return false;
+
+        if ("furnace".equals(itemType)) {
+            spawnPlacedObject(new entity.object.OBJ_Furnace(), col * tileSize, row * tileSize);
+            Player.furnace--;
+        } else {
+            spawnPlacedObject(new entity.object.OBJ_StoneBed(), col * tileSize, row * tileSize);
+            Player.stoneBed--;
+        }
+        return true;
     }
 
     public void spawnPlacedObject(Item item, int worldX, int worldY) {

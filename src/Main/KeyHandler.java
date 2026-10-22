@@ -133,9 +133,22 @@ public class KeyHandler implements KeyListener, MouseListener, MouseMotionListen
             return;
         }
 
-        if (gp.placementMode) {
+        if (gp.placementMode && e.getButton() == MouseEvent.BUTTON1) {
             gp.handlePlacementClick(e.getX(), e.getY());
             return;
+        }
+
+        // The selected hotbar slot controls the placement preview. Only consume
+        // the click when it actually places an item; other clicks keep their
+        // normal gameplay behavior.
+        if (e.getButton() == MouseEvent.BUTTON1 && gp.currentTab == 0) {
+            String selectedPlaceable = gp.getSelectedHotbarPlaceableItem();
+            if (selectedPlaceable != null) {
+                if (e.getY() >= 500 && e.getY() < 560 && e.getX() >= 150 && e.getX() < 600) {
+                    return;
+                }
+                if (gp.tryPlaceSelectedHotbarItem(e.getX(), e.getY())) return;
+            }
         }
 
         // Handle placement mode clicks

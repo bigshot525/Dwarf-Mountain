@@ -635,7 +635,7 @@ public class UI {
         return slotItems;
     }
 
-    public void drawgbarItems(Graphics2D g2, int x, int y, int slotWidth, int slotHeight) {
+    public void drawHotbarItems(Graphics2D g2, int x, int y, int slotWidth, int slotHeight) {
         if (!slotsInit) initInventorySlots();
 
         int[] counts = updatedHave();
