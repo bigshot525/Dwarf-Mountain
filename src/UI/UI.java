@@ -13,8 +13,8 @@ import java.awt.image.BufferedImage;
 public class UI {
     //inventory fields
     private static final int INV_COLS = 9;
-    private static final int INV_ROWS = 4;
-    private static final int INV_SLOT_COUNT = INV_COLS * INV_ROWS; // 36
+    private static final int inventory_level = 3;
+    private static final int INV_SLOT_COUNT = INV_COLS * inventory_level; // init to 9 slots
 
     private int[] slotItems;      // slotItems[slot] = index into names[]/itemIcons[], or -1 if empty
     private boolean slotsInit = false;
@@ -229,7 +229,18 @@ public class UI {
     private void drawInventory(Graphics2D g2) {
         //put inventoryBackground.png in the background of the inventory screen
         try {
-            BufferedImage inventoryBackground = javax.imageio.ImageIO.read(getClass().getResourceAsStream("/res/ui/inventoryBackground.png"));
+            BufferedImage inventoryBackground;
+            if(inventory_level == 1){
+                inventoryBackground = javax.imageio.ImageIO.read(getClass().getResourceAsStream("/res/ui/inventoryBackground_level_1.png"));
+            }else if(inventory_level == 2){
+                inventoryBackground = javax.imageio.ImageIO.read(getClass().getResourceAsStream("/res/ui/inventoryBackground_level_2.png"));
+            }else if(inventory_level == 3){
+                inventoryBackground = javax.imageio.ImageIO.read(getClass().getResourceAsStream("/res/ui/inventoryBackground_level_3.png"));
+            }else if(inventory_level == 4){
+                inventoryBackground = javax.imageio.ImageIO.read(getClass().getResourceAsStream("/res/ui/inventoryBackground_level_4.png"));
+            }
+
+
             if (inventoryBackground != null) {
                 g2.drawImage(inventoryBackground, 50, 50, gp.screenWidth - 100, gp.screenHeight - 220, null);
             }
