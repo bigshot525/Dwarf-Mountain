@@ -443,36 +443,36 @@ public class GamePanel extends JPanel implements Runnable {
         // Draw prompt AFTER player so it appears on top
         if (showDoorPrompt) {
             g2.setColor(new Color(0, 0, 0, 180));
-            g2.fillRoundRect(screenWidth / 2 - 80, screenHeight - 80, 160, 35, 10, 10);
+            g2.fillRoundRect(screenWidth / 2 - 80, screenHeight - 120, 160, 35, 10, 10);
             g2.setColor(Color.WHITE);
             g2.setFont(g2.getFont().deriveFont(Font.BOLD, 16f));
             FontMetrics fm = g2.getFontMetrics();
             String prompt = "Enter";
-            g2.drawString(prompt, screenWidth / 2 - fm.stringWidth(prompt) / 2, screenHeight - 57);
+            g2.drawString(prompt, screenWidth / 2 - fm.stringWidth(prompt) / 2, screenHeight - 97);
         }else if(showFurnacePrompt){
             g2.setColor(new Color(0, 0, 0, 180));
-            g2.fillRoundRect(screenWidth / 2 - 80, screenHeight - 80, 160, 35, 10, 10);
+            g2.fillRoundRect(screenWidth / 2 - 80, screenHeight - 120, 160, 35, 10, 10);
             g2.setColor(Color.WHITE);
             g2.setFont(g2.getFont().deriveFont(Font.BOLD, 16f));
             FontMetrics fm = g2.getFontMetrics();
             String prompt = "Right Click to Interact";
-            g2.drawString(prompt, screenWidth / 2 - fm.stringWidth(prompt) / 2, screenHeight - 57);
+            g2.drawString(prompt, screenWidth / 2 - fm.stringWidth(prompt) / 2, screenHeight - 97);
         }else if(showSleepPrompt){
             g2.setColor(new Color(0, 0, 0, 180));
-            g2.fillRoundRect(screenWidth / 2 - 150, screenHeight - 80, 300, 35, 10, 10);
+            g2.fillRoundRect(screenWidth / 2 - 150, screenHeight - 120, 300, 35, 10, 10);
             g2.setColor(Color.WHITE);
             g2.setFont(g2.getFont().deriveFont(Font.BOLD, 16f));
             FontMetrics fm = g2.getFontMetrics();
             String prompt = "Right Click to Sleep for the Night";
-            g2.drawString(prompt, screenWidth / 2 - fm.stringWidth(prompt) / 2, screenHeight - 57);
+            g2.drawString(prompt, screenWidth / 2 - fm.stringWidth(prompt) / 2, screenHeight - 97);
         }else if(showBalinsShopPrompt){
             g2.setColor(new Color(0, 0, 0, 180));
-            g2.fillRoundRect(screenWidth / 2 - 150, screenHeight - 80, 300, 35, 10, 10);
+            g2.fillRoundRect(screenWidth / 2 - 150, screenHeight - 120, 300, 35, 10, 10);
             g2.setColor(Color.WHITE);
             g2.setFont(g2.getFont().deriveFont(Font.BOLD, 16f));
             FontMetrics fm = g2.getFontMetrics();
             String prompt = "Right Click to Shop";
-            g2.drawString(prompt, screenWidth / 2 - fm.stringWidth(prompt) / 2, screenHeight - 57);
+            g2.drawString(prompt, screenWidth / 2 - fm.stringWidth(prompt) / 2, screenHeight - 97);
         }
 
         if(currentTab == 4){
@@ -626,16 +626,6 @@ public class GamePanel extends JPanel implements Runnable {
                         g2.drawRect(screenX, screenY, tileSize, tileSize);
                     }
                 }
-            }
-            // Draw instruction text
-            g2.setColor(new Color(0, 0, 0, 180));
-            g2.fillRoundRect(screenWidth / 2 - 120, screenHeight - 60, 240, 45, 10, 10);
-            g2.setColor(Color.WHITE);
-            g2.setFont(g2.getFont().deriveFont(Font.BOLD, 16f));
-            FontMetrics fm = g2.getFontMetrics();
-            String instruction = "Click to place | ESC to cancel";
-            if (placementMode) {
-                g2.drawString(instruction, screenWidth / 2 - fm.stringWidth(instruction) / 2, screenHeight - 30);
             }
         }else{
             return;
