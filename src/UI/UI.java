@@ -1,6 +1,7 @@
 package UI;
 
 import Main.GamePanel;
+import Main.KeyHandler;
 import UI.InteractionUIs.BalinInteractionUI;
 import entity.Player;
 import java.awt.Color;
@@ -8,13 +9,18 @@ import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
+import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
 
 public class UI {
     //inventory fields
     private static final int INV_COLS = 9;
-    private static final int inventory_level = 3;
+    private static final int inventory_level = 1;
     private static final int INV_SLOT_COUNT = INV_COLS * inventory_level; // init to 9 slots
+
+    public boolean curr_Side;
+
 
     private int[] slotItems;      // slotItems[slot] = index into names[]/itemIcons[], or -1 if empty
     private boolean slotsInit = false;
@@ -40,6 +46,12 @@ public class UI {
     private BufferedImage[] itemIcons;
     private BufferedImage[] craftIcons;
     private BufferedImage[] smeltIcons;
+    public BufferedImage balinStoreBackground;
+    private BufferedImage balinStoreSelectionLeft;
+    private BufferedImage balinStoreSelectionRight;
+    private Rectangle balinStoreLeftArrow;
+    private Rectangle balinStoreRightArrow;
+    private int balinStorePage;
 
     private int selectedCraftIndex = -1;
     private Rectangle[] craftSlotRects;
@@ -61,6 +73,8 @@ public class UI {
     };
 
 
+
+    private int itemCount = 0;
 
     //furnace recipesprivate int selectedSmeltIndex = -1;
     private Rectangle[] smeltSlotRects;
@@ -182,6 +196,22 @@ public class UI {
             } catch (Exception e) {
                 craftIcons[i] = null;
             }
+        }
+
+        try {
+            balinStoreBackground = javax.imageio.ImageIO.read(
+                getClass().getResourceAsStream("/res/UI/Balin_Store.png"));
+        } catch (Exception e) {
+            balinStoreBackground = null;
+        }
+        try {
+            balinStoreSelectionLeft = javax.imageio.ImageIO.read(
+                getClass().getResourceAsStream("/res/UI/Balin_Store_SelectionL.png"));
+            balinStoreSelectionRight = javax.imageio.ImageIO.read(
+                getClass().getResourceAsStream("/res/UI/Balin_Store_SelectionR.png"));
+        } catch (Exception e) {
+            balinStoreSelectionLeft = null;
+            balinStoreSelectionRight = null;
         }
     }
 
@@ -448,19 +478,27 @@ public class UI {
     }
 
     public void handleClick(int mouseX, int mouseY) {
-
+        if (gp.currentTab == 7) {
+            updateBalinStoreArrowHitboxes();
+            if (balinStoreLeftArrow != null && balinStoreLeftArrow.contains(mouseX, mouseY)) {
+                balinStorePage = Math.max(0, balinStorePage - 1);
+                return;
+            }
+            if (balinStoreRightArrow != null && balinStoreRightArrow.contains(mouseX, mouseY)) {
+                balinStorePage++;
+                return;
+            }
+        }
         if (gp.currentTab == 6 && passoutOkButton != null && passoutOkButton.contains(mouseX, mouseY)) {
             gp.currentTab = 0;
             return;
         }
-
         if (gp.currentTab == 3 && exitButton != null && exitButton.contains(mouseX, mouseY)) {
             gp.saveManager.save();
             gp.gameState = GameState.MAIN_MENU;
             gp.currentTab = 0;
             return;
         }
-
         // Balin dialogue skip/next button
         if (gp.currentTab == 8 && skipButton.contains(mouseX, mouseY)) {
             if(!gp.player.hasTalkedToBalin){
@@ -479,8 +517,6 @@ public class UI {
             }
             return;
         }
-
-
         // Furnace smelt slot selection
         if (gp.currentTab == 4 && smeltSlotRects != null) {
             for (int i = 0; i < smeltSlotRects.length; i++) {
@@ -512,7 +548,6 @@ public class UI {
                 return;
             }
         }
-
         if(gp.currentTab == 5){
             // Sleep screen buttons
             Rectangle yesButton = new Rectangle(70, 180, 100, 40);
@@ -527,9 +562,6 @@ public class UI {
                 return;
             }
         }
-
-
-
         // NOTE: inventory clicks (pickup/placement) are now handled by
         // handleInventoryPress/Drag/Release below, wired to mouse press/drag/release
         // events rather than the plain click handler here.
@@ -566,7 +598,6 @@ public class UI {
                 return;
             }
         }
-
         if (tabRects == null) return;
         for (int i = 0; i < tabRects.length; i++) {
             if (tabRects[i] != null && tabRects[i].contains(mouseX, mouseY)) {
@@ -938,13 +969,45 @@ public class UI {
     }
 
 
-    public void openBalinsShop(Graphics2D g2) {
-        drawBackground(g2);
-        g2.setColor(Color.WHITE);
-        g2.setFont(g2.getFont().deriveFont(Font.BOLD, 24f));
-        String msg = "Balins Shop -w Soon!";
-        FontMetrics fm = g2.getFontMetrics();
-        g2.drawString(msg, 200, 150);
+    public void openBalinsShop(Graphics2D g2) throws IOException {
+        BufferedImage background = balinStoreBackground;
+        int mouseX = gp.mouseScreenX;
+        int mouseY = gp.mouseScreenY;
+        int itemCount;
+
+        updateBalinStoreArrowHitboxes();
+
+        if (balinStoreLeftArrow.contains(mouseX, mouseY) && balinStoreSelectionLeft != null) {
+            background = balinStoreSelectionLeft;
+            //on click subtract 1 from itemCount
+            curr_Side = true;
+
+        } else if (balinStoreRightArrow.contains(mouseX, mouseY) && balinStoreSelectionRight != null) {
+            background = balinStoreSelectionRight;
+            //on click add 1 to itemCount
+            curr_Side = false;
+
+        }
+
+        if (background != null) {
+            g2.drawImage(background, 25, 25, gp.screenWidth-50, gp.screenHeight-50, null);
+        }
     }
 
+    public void updateCount(Boolean side){
+        if(side){ //subtract
+            if(itemCount == 0) return;
+            itemCount--;
+            System.out.println(itemCount);
+        }else{ //add
+            itemCount++;
+            System.out.println(itemCount);
+        }
+    }
+
+    private void updateBalinStoreArrowHitboxes() {
+        // Match the hitboxes to the arrow boxes in the displayed shop background.
+        balinStoreLeftArrow = new Rectangle(gp.screenWidth - 270, 330, 50, 80);
+        balinStoreRightArrow = new Rectangle(gp.screenWidth - 100, 330, 50, 80);
+    }
 }

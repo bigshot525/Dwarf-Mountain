@@ -15,6 +15,7 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.event.MouseListener;
+import java.io.IOException;
 import java.util.Random;
 import javax.swing.JPanel;
 import tile.TileManager;
@@ -485,7 +486,11 @@ public class GamePanel extends JPanel implements Runnable {
             ui.drawPassoutScreen(g2);
         }
         if(currentTab == 7){
-            ui.openBalinsShop(g2);
+            try {
+                ui.openBalinsShop(g2);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
         if (currentTab > 0 && currentTab < 4) ui.draw(g2);
 

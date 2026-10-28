@@ -102,10 +102,10 @@ public class KeyHandler implements KeyListener, MouseListener, MouseMotionListen
         }
         //mousewheel switching
         if (code == KeyEvent.VK_PAGE_UP) {
-            gp.player.currentHotbarSlot = (gp.player.currentHotbarSlot + 1) % 9; // wrap around
+            gp.player.currentHotbarSlot = (gp.player.currentHotbarSlot + 8) % 9; // wrap around
         }
         if (code == KeyEvent.VK_PAGE_DOWN) {
-            gp.player.currentHotbarSlot = (gp.player.currentHotbarSlot + 8) % 9; // wrap around
+            gp.player.currentHotbarSlot = (gp.player.currentHotbarSlot + 1) % 9; // wrap around
         }
     }
 
@@ -127,17 +127,14 @@ public class KeyHandler implements KeyListener, MouseListener, MouseMotionListen
             gp.saveScreen.handleClick(e.getX(), e.getY()); // route instead of block
             return;
         }
-
         if (gp.gameState == GameState.MAIN_MENU) {
             gp.mainMenu.handleClick(e.getX(), e.getY());
             return;
         }
-
         if (gp.placementMode && e.getButton() == MouseEvent.BUTTON1) {
             gp.handlePlacementClick(e.getX(), e.getY());
             return;
         }
-
         // The selected hotbar slot controls the placement preview. Only consume
         // the click when it actually places an item; other clicks keep their
         // normal gameplay behavior.
@@ -164,6 +161,13 @@ public class KeyHandler implements KeyListener, MouseListener, MouseMotionListen
             gp.ui.handleInventoryPress(e.getX(), e.getY());
             return;
         }
+        if (gp.currentTab == 7) {
+            if (e.getButton() == MouseEvent.BUTTON1) {
+                gp.ui.handleClick(e.getX(), e.getY());
+                gp.ui.updateCount(gp.ui.curr_Side);
+            }
+            return;
+        }
         if (gp.currentTab > 0) {
             gp.ui.handleClick(e.getX(), e.getY());
             return;
@@ -176,6 +180,8 @@ public class KeyHandler implements KeyListener, MouseListener, MouseMotionListen
             interactPressed = true;
         }
     }
+
+
 
     @Override
     public void mouseMoved(MouseEvent e) {
