@@ -36,6 +36,8 @@ public class UI {
     public String balinRegularDialogue = "";
     public int dailyBalinDialogueIndex = 0;
 
+    public String itemCountMessage;
+
 
     GamePanel gp;
     private BalinInteractionUI balinInteractionUI;
@@ -973,7 +975,7 @@ public class UI {
         BufferedImage background = balinStoreBackground;
         int mouseX = gp.mouseScreenX;
         int mouseY = gp.mouseScreenY;
-        int itemCount;
+        //create number to show the item count
 
         updateBalinStoreArrowHitboxes();
 
@@ -992,17 +994,21 @@ public class UI {
         if (background != null) {
             g2.drawImage(background, 25, 25, gp.screenWidth-50, gp.screenHeight-50, null);
         }
+        //draw item count to buy or sell
+        g2.setColor(Color.WHITE);
+        g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 40f));
+        g2.drawString(String.valueOf(itemCount), gp.screenWidth - 165, 380);
     }
 
-    public void updateCount(Boolean side){
+    public void updateCount(boolean side){
+
         if(side){ //subtract
             if(itemCount == 0) return;
             itemCount--;
-            System.out.println(itemCount);
         }else{ //add
             itemCount++;
-            System.out.println(itemCount);
         }
+        itemCountMessage = String.valueOf(itemCount);
     }
 
     private void updateBalinStoreArrowHitboxes() {
