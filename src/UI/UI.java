@@ -19,7 +19,8 @@ public class UI {
     private static final int inventory_level = 1;
     private static final int INV_SLOT_COUNT = INV_COLS * inventory_level; // init to 9 slots
 
-    public boolean curr_Side;
+    // true = left, false = right, null = neither side
+    public Boolean curr_Side;
 
 
     private int[] slotItems;      // slotItems[slot] = index into names[]/itemIcons[], or -1 if empty
@@ -976,9 +977,7 @@ public class UI {
         int mouseX = gp.mouseScreenX;
         int mouseY = gp.mouseScreenY;
         //create number to show the item count
-
         updateBalinStoreArrowHitboxes();
-
         if (balinStoreLeftArrow.contains(mouseX, mouseY) && balinStoreSelectionLeft != null) {
             background = balinStoreSelectionLeft;
             //on click subtract 1 from itemCount
@@ -988,7 +987,8 @@ public class UI {
             background = balinStoreSelectionRight;
             //on click add 1 to itemCount
             curr_Side = false;
-
+        }else{
+            curr_Side = null;
         }
 
         if (background != null) {
@@ -1000,7 +1000,8 @@ public class UI {
         g2.drawString(String.valueOf(itemCount), gp.screenWidth - 165, 380);
     }
 
-    public void updateCount(boolean side){
+    public void updateCount(Boolean side){
+        if(side == null) return; //if not on either arrow return
 
         if(side){ //subtract
             if(itemCount == 0) return;
