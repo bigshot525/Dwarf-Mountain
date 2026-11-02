@@ -67,6 +67,7 @@ public class SaveScreen {
 
         // Save slots
         for (int i = 0; i < Math.min(saves.length, MAX_VISIBLE); i++) {
+            if(mode == Mode.SAVE) continue;
             int slotY = SLOT_Y + i * (SLOT_H + SLOT_GAP);
 
             // Highlight selected
@@ -98,13 +99,13 @@ public class SaveScreen {
 
         // New save button (only in SAVE mode)
         if (mode == Mode.SAVE) {
-            int newY = SLOT_Y + Math.min(saves.length, MAX_VISIBLE) * (SLOT_H + SLOT_GAP);
+//            int newY = SLOT_Y + Math.min(saves.length, MAX_VISIBLE) * (SLOT_H + SLOT_GAP);
             g2.setColor(new Color(50, 120, 50, 200));
-            g2.fillRoundRect(SLOT_X, newY, SLOT_W, SLOT_H, 10, 10);
+            g2.fillRoundRect(SLOT_X, SLOT_Y, SLOT_W, SLOT_H, 10, 10);
             g2.setColor(Color.WHITE);
-            g2.drawRoundRect(SLOT_X, newY, SLOT_W, SLOT_H, 10, 10);
+            g2.drawRoundRect(SLOT_X, SLOT_Y, SLOT_W, SLOT_H, 10, 10);
             g2.setFont(g2.getFont().deriveFont(Font.BOLD, 18f));
-            g2.drawString("+ New Save", SLOT_X + 15, newY + 33);
+            g2.drawString("+ New Save", SLOT_X + 15, SLOT_Y + 33);
         }
 
         // Typing box
@@ -219,6 +220,7 @@ public class SaveScreen {
 
         // Slot clicks
         for (int i = 0; i < Math.min(saves.length, MAX_VISIBLE); i++) {
+            if(mode == Mode.SAVE) continue;
             int slotY = SLOT_Y + i * (SLOT_H + SLOT_GAP);
             Rectangle slot = new Rectangle(SLOT_X, slotY, SLOT_W, SLOT_H);
             if (slot.contains(mouseX, mouseY)) {
@@ -239,8 +241,8 @@ public class SaveScreen {
 
         // New save button
         if (mode == Mode.SAVE) {
-            int newY = SLOT_Y + Math.min(saves.length, MAX_VISIBLE) * (SLOT_H + SLOT_GAP);
-            Rectangle newSlot = new Rectangle(SLOT_X, newY, SLOT_W, SLOT_H);
+//            int newY = SLOT_Y + Math.min(saves.length, MAX_VISIBLE) * (SLOT_H + SLOT_GAP);
+            Rectangle newSlot = new Rectangle(SLOT_X, SLOT_Y, SLOT_W, SLOT_H);
             if (newSlot.contains(mouseX, mouseY)) {
                 typing = true;
                 typingName = "";
