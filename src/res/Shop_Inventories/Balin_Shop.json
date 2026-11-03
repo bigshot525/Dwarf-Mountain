@@ -1,0 +1,10 @@
+{
+  "bread": {
+    "quantity": 50,
+    "price": 5
+  },
+  "coal": {
+    "quantity": 100,
+    "price": 2
+  }
+}

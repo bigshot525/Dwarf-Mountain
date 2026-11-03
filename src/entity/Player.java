@@ -39,6 +39,7 @@ public class Player extends Entity {
     public static int gold = 0;
     public static int goldOre = 0;
     public static int coal = 100;
+    public static int bread = 0;
 
     //placeable items
     public static int furnace = 1;
@@ -70,9 +71,10 @@ public class Player extends Entity {
     public void setDefaultValues() {
         worldX = gp.tileSize * 23;
         worldY = gp.tileSize * 21;
-        speed = 4;
+        speed = 10;
         direction = "down";
     }
+
 
     public void getPlayerImage() {
         try {
@@ -137,11 +139,6 @@ public class Player extends Entity {
         }
 
 
-
-
-        // -------------------------
-        // ATTACK UPDATE
-        // -------------------------
         if (attacking) {
             attackCounter++;
 
@@ -266,7 +263,6 @@ public class Player extends Entity {
                 case "right": image = (spriteNum == 1) ? right1 : right2; break;
             }
         }
-
         g2.drawImage(image, drawX, drawY, drawWidth, drawHeight, null);
     }
 

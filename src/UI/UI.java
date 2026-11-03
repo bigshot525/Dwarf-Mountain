@@ -994,14 +994,19 @@ public class UI {
         if (background != null) {
             g2.drawImage(background, 25, 25, gp.screenWidth-50, gp.screenHeight-50, null);
         }
+        // Temporary placeholders for the shop's buyable item cards.
+        drawBuyItemCards(g2);
+
         //draw item count to buy or sell
         g2.setColor(Color.WHITE);
         g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 40f));
         g2.drawString(String.valueOf(itemCount), gp.screenWidth - 165, 380);
     }
 
+
     public void updateCount(Boolean side){
         if(side == null) return; //if not on either arrow return
+//        if(curr_Item == null) return; //user hasnt clicked an item card
 
         if(side){ //subtract
             if(itemCount == 0) return;
@@ -1016,5 +1021,31 @@ public class UI {
         // Match the hitboxes to the arrow boxes in the displayed shop background.
         balinStoreLeftArrow = new Rectangle(gp.screenWidth - 270, 330, 50, 80);
         balinStoreRightArrow = new Rectangle(gp.screenWidth - 100, 330, 50, 80);
+    }
+
+    public void drawBuyItemCards(Graphics2D g2){
+        int cardWidth = 265;
+        int cardHeight = 100;
+        int gap = 20;
+        int BalinBuyItems = 3;
+        int x = 200;
+        int startY = 60;
+
+
+        for (int i = 0; i < BalinBuyItems; i++) {
+            int y = startY + i * (cardHeight + gap);
+            g2.setColor(new Color(45, 35, 25, 220));
+            g2.fillRoundRect(x, y, cardWidth, cardHeight, 16, 16);
+            g2.setColor(new Color(220, 190, 130));
+//            g2.setStroke(new BasicStroke(3));
+            g2.drawRoundRect(x, y, cardWidth, cardHeight, 16, 16);
+
+            g2.setColor(Color.WHITE);
+            g2.setFont(g2.getFont().deriveFont(Font.BOLD, 18f));
+            g2.drawString("Item " + (i + 1), x + 20, y + 35);
+            g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 14f));
+            g2.drawString("Temporary card", x + 20, y + 65);
+            g2.drawString("Price: --", x + 20, y + cardHeight - 20);
+        }
     }
 }
