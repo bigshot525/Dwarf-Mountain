@@ -12,6 +12,12 @@ import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class UI {
     //inventory fields
@@ -55,6 +61,21 @@ public class UI {
     private Rectangle balinStoreLeftArrow;
     private Rectangle balinStoreRightArrow;
     private int balinStorePage;
+    private final List<ShopItem> balinShopItems = new ArrayList<>();
+
+    private static class ShopItem {
+        final String name;
+        final int quantity;
+        final int price;
+        final BufferedImage icon;
+
+        ShopItem(String name, int quantity, int price, BufferedImage icon) {
+            this.name = name;
+            this.quantity = quantity;
+            this.price = price;
+            this.icon = icon;
+        }
+    }
 
     private int selectedCraftIndex = -1;
     private Rectangle[] craftSlotRects;
@@ -162,6 +183,28 @@ public class UI {
         balinInteractionUI = new BalinInteractionUI(gp, this);
 
         loadItemIcons();
+        loadBalinShopItems();
+    }
+
+    private void loadBalinShopItems() {
+        try (InputStream stream = getClass().getResourceAsStream("/res/Shop_Inventories/Balin_Shop.json")) {
+            if (stream == null) return;
+            String json = new String(stream.readAllBytes(), StandardCharsets.UTF_8);
+            Pattern itemPattern = Pattern.compile("\\\"([^\\\"]+)\\\"\\s*:\\s*\\{\\s*\\\"quantity\\\"\\s*:\\s*(\\d+)\\s*,\\s*\\\"price\\\"\\s*:\\s*(\\d+)\\s*\\}");
+            Matcher matcher = itemPattern.matcher(json);
+            while (matcher.find()) {
+                String name = matcher.group(1);
+                String iconPath = "/res/objects/" + name + ".png";
+                BufferedImage icon = null;
+                try (InputStream iconStream = getClass().getResourceAsStream(iconPath)) {
+                    if (iconStream != null) icon = javax.imageio.ImageIO.read(iconStream);
+                }
+                balinShopItems.add(new ShopItem(name, Integer.parseInt(matcher.group(2)),
+                    Integer.parseInt(matcher.group(3)), icon));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
     //inventoryItemNames = {"Stone", "Wood","Coal", "Iron Ore", "Iron","Gold Ore", "Gold", "Furnace"};
 
@@ -1024,28 +1067,29 @@ public class UI {
     }
 
     public void drawBuyItemCards(Graphics2D g2){
-        int cardWidth = 265;
+        int cardWidth = Math.min(320, gp.screenWidth - 250);
         int cardHeight = 100;
-        int gap = 20;
-        int BalinBuyItems = 3;
-        int x = 200;
+        int gap = 16;
+        int x = 120;
         int startY = 60;
 
-
-        for (int i = 0; i < BalinBuyItems; i++) {
+        for (int i = 0; i < balinShopItems.size(); i++) {
+            ShopItem item = balinShopItems.get(i);
             int y = startY + i * (cardHeight + gap);
             g2.setColor(new Color(45, 35, 25, 220));
             g2.fillRoundRect(x, y, cardWidth, cardHeight, 16, 16);
             g2.setColor(new Color(220, 190, 130));
-//            g2.setStroke(new BasicStroke(3));
             g2.drawRoundRect(x, y, cardWidth, cardHeight, 16, 16);
 
             g2.setColor(Color.WHITE);
             g2.setFont(g2.getFont().deriveFont(Font.BOLD, 18f));
-            g2.drawString("Item " + (i + 1), x + 20, y + 35);
+            g2.drawString(item.name, x + 20, y + 30);
             g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 14f));
-            g2.drawString("Temporary card", x + 20, y + 65);
-            g2.drawString("Price: --", x + 20, y + cardHeight - 20);
+            g2.drawString("In stock: " + item.quantity, x + 20, y + 56);
+            g2.drawString("Price: " + item.price, x + 20, y + 80);
+            if (item.icon != null) {
+                g2.drawImage(item.icon, x + cardWidth - 76, y + 12, 64, 64, null);
+            }
         }
     }
 }
