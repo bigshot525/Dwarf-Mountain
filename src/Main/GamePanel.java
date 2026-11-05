@@ -880,6 +880,7 @@ public class GamePanel extends JPanel implements Runnable {
 
     }
     public void checkBalinInteraction() {
+        if(ui.dailyBalinDialogueIndex >= 2) return;
         // Find the tile the player is facing
         int col = (player.worldX + tileSize / 2) / tileSize;
         int row = (player.worldY + tileSize / 2) / tileSize;
