@@ -486,11 +486,7 @@ public class GamePanel extends JPanel implements Runnable {
             ui.drawPassoutScreen(g2);
         }
         if(currentTab == 7){
-            try {
-                ui.openBalinsShop(g2);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+            ui.openBalinsShop(g2);
         }
         if (currentTab > 0 && currentTab < 4) ui.draw(g2);
 

@@ -164,7 +164,7 @@ public class KeyHandler implements KeyListener, MouseListener, MouseMotionListen
         if (gp.currentTab == 7) {
             if (e.getButton() == MouseEvent.BUTTON1) {
                 gp.ui.handleClick(e.getX(), e.getY());
-                gp.ui.updateCount(gp.ui.curr_Side);
+                gp.ui.updateCount();
             }
             return;
         }

@@ -12,22 +12,12 @@ import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class UI {
     //inventory fields
     private static final int INV_COLS = 9;
     private static final int inventory_level = 1;
     private static final int INV_SLOT_COUNT = INV_COLS * inventory_level; // init to 9 slots
-
-    // true = left, false = right, null = neither side
-    public Boolean curr_Side;
-
 
     private int[] slotItems;      // slotItems[slot] = index into names[]/itemIcons[], or -1 if empty
     private boolean slotsInit = false;
@@ -43,11 +33,9 @@ public class UI {
     public String balinRegularDialogue = "";
     public int dailyBalinDialogueIndex = 0;
 
-    public String itemCountMessage;
-
-
     GamePanel gp;
     private BalinInteractionUI balinInteractionUI;
+    private BalinStoreUI balinStoreUI;
     
     private Rectangle[] tabRects = new Rectangle[3];
     private Rectangle exitButton;
@@ -55,28 +43,6 @@ public class UI {
     private BufferedImage[] itemIcons;
     private BufferedImage[] craftIcons;
     private BufferedImage[] smeltIcons;
-    public BufferedImage balinStoreBackground;
-    private BufferedImage balinStoreSelectionLeft;
-    private BufferedImage balinStoreSelectionRight;
-    private Rectangle balinStoreLeftArrow;
-    private Rectangle balinStoreRightArrow;
-    private int balinStorePage;
-    private final List<ShopItem> balinShopItems = new ArrayList<>();
-
-    private static class ShopItem {
-        final String name;
-        final int quantity;
-        final int price;
-        final BufferedImage icon;
-
-        ShopItem(String name, int quantity, int price, BufferedImage icon) {
-            this.name = name;
-            this.quantity = quantity;
-            this.price = price;
-            this.icon = icon;
-        }
-    }
-
     private int selectedCraftIndex = -1;
     private Rectangle[] craftSlotRects;
     private Rectangle craftButton;
@@ -98,7 +64,6 @@ public class UI {
 
 
 
-    private int itemCount = 0;
 
     //furnace recipesprivate int selectedSmeltIndex = -1;
     private Rectangle[] smeltSlotRects;
@@ -181,30 +146,9 @@ public class UI {
     public UI(GamePanel gp) {
         this.gp = gp;
         balinInteractionUI = new BalinInteractionUI(gp, this);
+        balinStoreUI = new BalinStoreUI(gp);
 
         loadItemIcons();
-        loadBalinShopItems();
-    }
-
-    private void loadBalinShopItems() {
-        try (InputStream stream = getClass().getResourceAsStream("/res/Shop_Inventories/Balin_Shop.json")) {
-            if (stream == null) return;
-            String json = new String(stream.readAllBytes(), StandardCharsets.UTF_8);
-            Pattern itemPattern = Pattern.compile("\\\"([^\\\"]+)\\\"\\s*:\\s*\\{\\s*\\\"quantity\\\"\\s*:\\s*(\\d+)\\s*,\\s*\\\"price\\\"\\s*:\\s*(\\d+)\\s*\\}");
-            Matcher matcher = itemPattern.matcher(json);
-            while (matcher.find()) {
-                String name = matcher.group(1);
-                String iconPath = "/res/objects/" + name + ".png";
-                BufferedImage icon = null;
-                try (InputStream iconStream = getClass().getResourceAsStream(iconPath)) {
-                    if (iconStream != null) icon = javax.imageio.ImageIO.read(iconStream);
-                }
-                balinShopItems.add(new ShopItem(name, Integer.parseInt(matcher.group(2)),
-                    Integer.parseInt(matcher.group(3)), icon));
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
     //inventoryItemNames = {"Stone", "Wood","Coal", "Iron Ore", "Iron","Gold Ore", "Gold", "Furnace"};
 
@@ -244,21 +188,6 @@ public class UI {
             }
         }
 
-        try {
-            balinStoreBackground = javax.imageio.ImageIO.read(
-                getClass().getResourceAsStream("/res/UI/Balin_Store.png"));
-        } catch (Exception e) {
-            balinStoreBackground = null;
-        }
-        try {
-            balinStoreSelectionLeft = javax.imageio.ImageIO.read(
-                getClass().getResourceAsStream("/res/UI/Balin_Store_SelectionL.png"));
-            balinStoreSelectionRight = javax.imageio.ImageIO.read(
-                getClass().getResourceAsStream("/res/UI/Balin_Store_SelectionR.png"));
-        } catch (Exception e) {
-            balinStoreSelectionLeft = null;
-            balinStoreSelectionRight = null;
-        }
     }
 
     public void draw(Graphics2D g2) {
@@ -525,15 +454,8 @@ public class UI {
 
     public void handleClick(int mouseX, int mouseY) {
         if (gp.currentTab == 7) {
-            updateBalinStoreArrowHitboxes();
-            if (balinStoreLeftArrow != null && balinStoreLeftArrow.contains(mouseX, mouseY)) {
-                balinStorePage = Math.max(0, balinStorePage - 1);
-                return;
-            }
-            if (balinStoreRightArrow != null && balinStoreRightArrow.contains(mouseX, mouseY)) {
-                balinStorePage++;
-                return;
-            }
+            balinStoreUI.handleClick(mouseX, mouseY);
+            return;
         }
         if (gp.currentTab == 6 && passoutOkButton != null && passoutOkButton.contains(mouseX, mouseY)) {
             gp.currentTab = 0;
@@ -1015,81 +937,12 @@ public class UI {
     }
 
 
-    public void openBalinsShop(Graphics2D g2) throws IOException {
-        BufferedImage background = balinStoreBackground;
-        int mouseX = gp.mouseScreenX;
-        int mouseY = gp.mouseScreenY;
-        //create number to show the item count
-        updateBalinStoreArrowHitboxes();
-        if (balinStoreLeftArrow.contains(mouseX, mouseY) && balinStoreSelectionLeft != null) {
-            background = balinStoreSelectionLeft;
-            //on click subtract 1 from itemCount
-            curr_Side = true;
-
-        } else if (balinStoreRightArrow.contains(mouseX, mouseY) && balinStoreSelectionRight != null) {
-            background = balinStoreSelectionRight;
-            //on click add 1 to itemCount
-            curr_Side = false;
-        }else{
-            curr_Side = null;
-        }
-
-        if (background != null) {
-            g2.drawImage(background, 25, 25, gp.screenWidth-50, gp.screenHeight-50, null);
-        }
-        // Temporary placeholders for the shop's buyable item cards.
-        drawBuyItemCards(g2);
-
-        //draw item count to buy or sell
-        g2.setColor(Color.WHITE);
-        g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 40f));
-        g2.drawString(String.valueOf(itemCount), gp.screenWidth - 165, 380);
+    public void openBalinsShop(Graphics2D g2) {
+        balinStoreUI.draw(g2);
     }
 
 
-    public void updateCount(Boolean side){
-        if(side == null) return; //if not on either arrow return
-//        if(curr_Item == null) return; //user hasnt clicked an item card
-
-        if(side){ //subtract
-            if(itemCount == 0) return;
-            itemCount--;
-        }else{ //add
-            itemCount++;
-        }
-        itemCountMessage = String.valueOf(itemCount);
-    }
-
-    private void updateBalinStoreArrowHitboxes() {
-        // Match the hitboxes to the arrow boxes in the displayed shop background.
-        balinStoreLeftArrow = new Rectangle(gp.screenWidth - 270, 330, 50, 80);
-        balinStoreRightArrow = new Rectangle(gp.screenWidth - 100, 330, 50, 80);
-    }
-
-    public void drawBuyItemCards(Graphics2D g2){
-        int cardWidth = Math.min(320, gp.screenWidth - 250);
-        int cardHeight = 100;
-        int gap = 16;
-        int x = 120;
-        int startY = 60;
-
-        for (int i = 0; i < balinShopItems.size(); i++) {
-            ShopItem item = balinShopItems.get(i);
-            int y = startY + i * (cardHeight + gap);
-            g2.setColor(new Color(45, 35, 25, 220));
-            g2.fillRoundRect(x, y, cardWidth, cardHeight, 16, 16);
-            g2.setColor(new Color(220, 190, 130));
-            g2.drawRoundRect(x, y, cardWidth, cardHeight, 16, 16);
-
-            g2.setColor(Color.WHITE);
-            g2.setFont(g2.getFont().deriveFont(Font.BOLD, 18f));
-            g2.drawString(item.name, x + 20, y + 30);
-            g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 14f));
-            g2.drawString("In stock: " + item.quantity, x + 20, y + 56);
-            g2.drawString("Price: " + item.price, x + 20, y + 80);
-            if (item.icon != null) {
-                g2.drawImage(item.icon, x + cardWidth - 76, y + 12, 64, 64, null);
-            }
-        }
+    public void updateCount(){
+        balinStoreUI.updateCount();
     }
 }
